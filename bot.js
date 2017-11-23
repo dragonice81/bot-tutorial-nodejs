@@ -5,7 +5,7 @@ var botID = process.env.BOT_ID;
 
 function respond() {
   var request = JSON.parse(this.req.chunks[0]),
-      botRegex = /^\/cool guy$/;
+      botRegex = /^Ye\?|ye\?$/;
 
   if(request.text && botRegex.test(request.text)) {
     this.res.writeHead(200);
@@ -18,6 +18,10 @@ function respond() {
   }
 }
 
+function randomInt (low, high) {
+  return Math.floor(Math.random() * (high - low) + low);
+}
+
 function postMessage() {
   var botResponse, options, body, botReq;
 
@@ -28,7 +32,13 @@ function postMessage() {
     path: '/v3/bots/post',
     method: 'POST'
   };
-
+  var number = randomInt(1,101);
+  if (number >= 90) {
+    botResponse = 'nerr';
+  }
+  else {
+    botResponse = 'ye';
+  }
   body = {
     "bot_id" : botID,
     "text" : botResponse
