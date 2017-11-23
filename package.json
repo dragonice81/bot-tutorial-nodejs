@@ -7,7 +7,7 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "director": "",
+    "director":"1.2.8",
     "cool-ascii-faces": "~1.3.x"
   },
   "engines": {
