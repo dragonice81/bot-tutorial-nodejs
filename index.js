@@ -29,6 +29,17 @@ server.listen(port);
 
 function ping() {
   var ye = '@garrettbot #jay cutler'
-  this.res.writeHead(200);
-  this.res.end(ye.substring(13).trim());
+  var regex = /@garrettbot #[a-zA-Z ]+/
+  var retval = '';
+  if (regex.test(ye)) {
+    retval = ye.substring(13).trim();
+    this.res.writeHead(200);
+    this.res.end(retval);
+  
+  }
+  else {
+    this.res.writeHead(200);
+    this.res.end('ye');
+  
+  }
 }
