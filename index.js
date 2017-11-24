@@ -28,6 +28,7 @@ port = Number(process.env.PORT || 5000);
 server.listen(port);
 
 function ping() {
+  var ye = '@garrettbot #jay cutler'
   this.res.writeHead(200);
-  this.res.end("GarrettBot");
+  this.res.end(ye.substring(13).trim());
 }
