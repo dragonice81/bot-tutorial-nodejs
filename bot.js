@@ -6,13 +6,14 @@ var botID = process.env.BOT_ID;
 function respond() {
   var request = JSON.parse(this.req.chunks[0]),
       yeRegex = /^Ye\?|ye\?$/,
-      gifRegex = /@garrettbot #[a-zA-Z]+/;
+      gifRegex = /@garrettbot #[a-zA-Z ]+/;
 
   if(request.text && yeRegex.test(request.text)) {
     this.res.writeHead(200);
     postMessage();
     this.res.end();
   } else if (request.text && gifRegex.test(request.text)) {
+    console.log('ye');
     this.res.writeHead(200);
     gifTag(request.text);
     this.res.end();
