@@ -5,8 +5,6 @@ director    = require('director');
 cool        = require('cool-ascii-faces');
 bot         = require('./bot.js');
 
-var dotenv = require('dotenv');
-dotenv.load();
 
 router = new director.http.Router({
   '/' : {
