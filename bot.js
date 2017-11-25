@@ -78,8 +78,8 @@ function gifTag(message) {
   parsedData = JSON.parse(body);
   
   if (!error && response.statusCode == 200 && parsedData && parsedData.data) {
-    _.shuffle(parsedData.data);
-    var botResponse = parsedData.data[0].images.downsized.url;
+    var giphyResponse = _.shuffle(parsedData.data);
+    var botResponse = giphyResponse[0].images.downsized.url;
     
     var options = {
       hostname: 'api.groupme.com',
