@@ -1,6 +1,8 @@
+
 var HTTPS = require('https');
 var request = require('request');
 var cool = require('cool-ascii-faces');
+var fs = require('fs');
 
 var botID = process.env.BOT_ID;
 var _ = require('lodash');
@@ -11,9 +13,16 @@ var options = {
   method: 'POST'
 };
 
+var members = {};
+var apiKey = process.env.API_KEY;
+apiKey = 'K1BGzqSK0d1dPnX6WtdhztckzC6Jg1agFqULMu9L';
+
+var messages = [];
+
 
 function respond() {
-  var request = JSON.parse(this.req.chunks[0]),
+  // var request = JSON.parse(this.req.chunks[0]),
+  var request = {text: '-leaderboard'},  
       yeRegex = /^Ye\?|ye\?$/,
       gifRegex = /#[a-zA-Z ]+/,
       leaderRegex = /-leaderboard/;
@@ -23,9 +32,12 @@ function respond() {
     postMessage();
     this.res.end();
   } else if (request.text && gifRegex.test(request.text)) {
-    console.log('ye');
     this.res.writeHead(200);
     gifTag(request.text);
+    this.res.end();
+  } else if (request.text && leaderRegex.test(request.text)) {
+    this.res.writeHead(200);
+    doLeaderboard();
     this.res.end();
   } else {
     console.log("don't care");
@@ -97,7 +109,53 @@ function gifTag(message) {
 }
 
 function doLeaderboard() {
+  var members = {};
+  var leaderboard = {};
+  var messages = [];
+  request('https://api.groupme.com/v3/groups/21255858?token=' + apiKey, function (error, response, body) {
+    var parsedData = JSON.parse(body);
+    if (!error && response.statusCode == 200 && parsedData && parsedData.response) {
+      for (var i = 0; i < parsedData.response.members.length; i++) {
+        members[parsedData.response.members[i].user_id] = parsedData.response.members[i].nickname;
+        leaderboard[parsedData.response.members[i].nickname] = {likes: 0, likesGivenOut: 0};
+        leaderboard['GarrettBot'] = {likes: 0, likesGivenOut: 0};
+      }
+    }
+    request('https://api.groupme.com/v3/groups/21255858/likes?period=month&token=' + apiKey, function (error, response, body) {
+      var parsedData = JSON.parse(body);
+      if (!error && response.statusCode == 200 && parsedData && parsedData.response) {
+        messages = parsedData.response.messages;
+        // console.log(parsedData.response);
+        
+      }
+      for (var j = 0; j < messages.length; j++) {
+        message = messages[j];
+        // console.log(message);
+        leaderboard[message.name].likes += message.favorited_by.length;
+        for (var i = 0; i < message.favorited_by.length; i++) {
+          leaderboard[members[message.favorited_by[i]]].likesGivenOut++;
+        }
+    
+      }
 
+      console.log(leaderboard);
+      generateLeaderBoardResponse(leaderboard);
+  
+
+    });
+  
+
+  });
+  
+}
+function generateLeaderBoardResponse(leaderboard) {
+  var botResponse = 'Leaderboard:\n';
+  for (var i = 0; i < Object.keys(leaderboard).length; i++) {
+    botResponse += Object.keys(leaderboard)[i] + ':\n';
+    botResponse += `  Likes: ${leaderboard[Object.keys(leaderboard)[i]].likes}\n`;
+    botResponse += `  Likes given: ${leaderboard[Object.keys(leaderboard)[i]].likesGivenOut}\n`;
+  }
+  sendResponse(botResponse);
 }
 
 exports.respond = respond;
