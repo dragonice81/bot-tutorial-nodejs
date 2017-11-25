@@ -21,8 +21,8 @@ var messages = [];
 
 
 function respond() {
-  // var request = JSON.parse(this.req.chunks[0]),
-  var request = {text: '-leaderboard'},  
+  var request = JSON.parse(this.req.chunks[0]),
+  // var request = {text: '-leaderboard'},  
       yeRegex = /^Ye\?|ye\?$/,
       gifRegex = /#[a-zA-Z ]+/,
       leaderRegex = /-leaderboard/;
