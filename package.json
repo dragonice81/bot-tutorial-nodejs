@@ -9,7 +9,8 @@
   "dependencies": {
     "director": "1.2.8",
     "cool-ascii-faces": "~1.3.x",
-    "request": "2.83.0"
+    "request": "2.83.0",
+    "lodash":"4.17.4"
   },
   "engines": {
     "node": "9.2.x"

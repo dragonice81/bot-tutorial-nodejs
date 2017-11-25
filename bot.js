@@ -3,6 +3,7 @@ var request = require('request');
 var cool = require('cool-ascii-faces');
 
 var botID = '678c500d5d216e077e520322bc';
+var _ = require('lodash');
 
 function respond() {
   var request = JSON.parse(this.req.chunks[0]),
@@ -73,11 +74,12 @@ function postMessage() {
 
 function gifTag(message) {
 
-  request('https://api.giphy.com/v1/gifs/translate?s=' + message.substring(13).trim() + '&api_key=dc6zaTOxFJmzC&rating=r', function (error, response, body) {
+  request('https://api.giphy.com/v1/gifs/search?q=' + message.substring(13).trim() + '&api_key=dc6zaTOxFJmzC&rating=r&limit=1000', function (error, response, body) {
   parsedData = JSON.parse(body);
   
-  if (!error && response.statusCode == 200 && parsedData && parsedData.data.images) {
-    var botResponse = parsedData.data.images.downsized.url;
+  if (!error && response.statusCode == 200 && parsedData && parsedData.data) {
+    _.shuffle(parsedData.data);
+    var botResponse = parsedData.data[0].images.downsized.url;
     
     var options = {
       hostname: 'api.groupme.com',
