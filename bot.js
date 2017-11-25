@@ -74,7 +74,7 @@ function postMessage() {
 
 function gifTag(message) {
 
-  request('https://api.giphy.com/v1/gifs/search?q=' + message.substring(13).trim() + '&api_key=dc6zaTOxFJmzC&rating=r&limit=100', function (error, response, body) {
+  request('https://api.giphy.com/v1/gifs/search?q=' + message.substring(13).trim() + '&api_key=dc6zaTOxFJmzC&rating=r&limit=25', function (error, response, body) {
   parsedData = JSON.parse(body);
   
   if (!error && response.statusCode == 200 && parsedData && parsedData.data) {
