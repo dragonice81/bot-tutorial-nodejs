@@ -3,7 +3,6 @@ var HTTPS = require('https');
 var request = require('request');
 var cool = require('cool-ascii-faces');
 var fs = require('fs');
-var shorturl = require('shorturl');
 
 var botID = process.env.BOT_ID;
 botID = '678c500d5d216e077e520322bc';
@@ -195,7 +194,10 @@ function getDirections(directionString) {
   const googleUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${beginningLocString}&destination=${destLocString}&key=${process.env.MAP_KEY}`;
   request(googleUrl, function (error, response, body) {
     let jsonResponse = JSON.parse(response.body);
-    let googleMapsUri = shorturl(`https://www.google.com/maps/dir/${beginningLocString}/${destLocString}`, 'goo.gl', (result) => {
+    const urlShortenerUrl = `https://www.googleapis.com/urlshortener/v1/url?key=${process.env.URL_SHORT_KEY}`;
+    const googleMapsUri = `https://www.google.com/maps/dir/${beginningLocString}/${destLocString}`;
+    let shortGoogleMapsUri = request.post(urlShortenerUrl, {json: {longUrl: googleMapsUri}}, (response, body) => {
+      const shortUrl = JSON.parse(response.body).id;
       let botResponse =
       `Directions from:
   ${beginningLocString.replace(/[+]/g, ' ')}
@@ -204,7 +206,7 @@ to:
 
 It will take ${jsonResponse.routes[0].legs[0].duration.text} to travel ${jsonResponse.routes[0].legs[0].distance.text}
 
-Click this to start navigation: ${result}`;    
+Click this to start navigation: ${shortUrl}`;    
       sendResponse(botResponse);
   
     });
