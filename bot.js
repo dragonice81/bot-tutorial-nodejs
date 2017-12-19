@@ -197,10 +197,10 @@ function getDirections(directionString) {
     let botResponse =
     `Directions from:
       ${beginningLocString.replace('+', ' ')}
-    to:
-      ${destLocString.replace('+', ' ')}
-    It will take ${jsonResponse.routes[0].legs[0].duration} to travel ${jsonResponse.routes[0].legs[0].distance}
-    Click this to start navigation: maps.google.com`;    
+to:
+  ${destLocString.replace('+', ' ')}
+It will take ${jsonResponse.routes[0].legs[0].duration.text} to travel ${jsonResponse.routes[0].legs[0].distance.text}
+Click this to start navigation: maps.google.com`;    
     sendResponse(botResponse);
   });
 }
