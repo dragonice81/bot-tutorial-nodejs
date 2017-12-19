@@ -193,14 +193,14 @@ function getDirections(directionString) {
   const destLocString = arrayToURLParam(destinationArray);
   const googleUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${beginningLocString}&destination=${destLocString}&key=${process.env.MAP_KEY}`;
   request(googleUrl, function (error, response, body) {
-    let botResponse =
-    `Directions from:
-      ${beginningLocString.replace('+', ' ')}
-    to:
-      ${destLocString.replace('+', ' ')}
-    It will take ${response.routes[0].legs[0].duration} to travel ${response.routes[0].legs[0].distance}
-    Click this to start navigation: maps.google.com`;    
-    sendResponse(botResponse);
+    // let botResponse =
+    // `Directions from:
+    //   ${beginningLocString.replace('+', ' ')}
+    // to:
+    //   ${destLocString.replace('+', ' ')}
+    // It will take ${response.routes[0].legs[0].duration} to travel ${response.routes[0].legs[0].distance}
+    // Click this to start navigation: maps.google.com`;    
+    sendResponse(response);
 
   });
 }
