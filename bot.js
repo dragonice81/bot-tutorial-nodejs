@@ -183,7 +183,7 @@ function getDirections(directionString) {
   directionStringArray.shift();
   var beginningArray = [];
   var destinationArray = [];
-  while (directionStringArray[0] !== 'to:' || directionStringArray[0] !== 'to') {
+  while (directionStringArray[0].replace(':', '') !== 'to') {
     beginningArray.push(directionStringArray.shift());
   }
   directionStringArray.shift();
