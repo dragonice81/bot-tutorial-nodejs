@@ -200,7 +200,7 @@ function getDirections(directionString) {
     //   ${destLocString.replace('+', ' ')}
     // It will take ${response.routes[0].legs[0].duration} to travel ${response.routes[0].legs[0].distance}
     // Click this to start navigation: maps.google.com`;    
-    sendResponse(response);
+    console.log(response);
 
   });
 }
