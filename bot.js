@@ -5,6 +5,7 @@ var cool = require('cool-ascii-faces');
 var fs = require('fs');
 
 var botID = process.env.BOT_ID;
+botID = '678c500d5d216e077e520322bc';
 var _ = require('lodash');
 
 var options = {
