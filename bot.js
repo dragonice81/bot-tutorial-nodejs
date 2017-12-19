@@ -5,6 +5,7 @@ var cool = require('cool-ascii-faces');
 var fs = require('fs');
 
 var botID = process.env.BOT_ID;
+botID = '678c500d5d216e077e520322bc';
 var _ = require('lodash');
 
 var options = {
@@ -15,7 +16,6 @@ var options = {
 
 var members = {};
 var apiKey = process.env.API_KEY;
-apiKey = 'K1BGzqSK0d1dPnX6WtdhztckzC6Jg1agFqULMu9L';
 
 var messages = [];
 
@@ -26,20 +26,29 @@ function respond() {
       yeRegex = /^Ye\?|ye\?$/,
       gifRegex = /#[a-zA-Z ]+/,
       leaderRegex = /-leaderboard/;
+      directionsRegex = /directions from: ([0-9a-zA-Z .,]+) to: ([0-9a-zA-Z .,]+)/;
 
-  if(request.text && yeRegex.test(request.text)) {
+  if (request.text && yeRegex.test(request.text)) {
     this.res.writeHead(200);
     postMessage();
     this.res.end();
-  } else if (request.text && gifRegex.test(request.text)) {
+  }
+  else if (request.text && gifRegex.test(request.text)) {
     this.res.writeHead(200);
     gifTag(request.text);
     this.res.end();
-  } else if (request.text && leaderRegex.test(request.text)) {
+  }
+  else if (request.text && leaderRegex.test(request.text)) {
     this.res.writeHead(200);
     doLeaderboard();
     this.res.end();
-  } else {
+  }
+  else if (request.text && directionsRegex.test(request.text)) {
+    this.res.writeHead(200);
+    getDirections(request.text);
+    this.res.end();
+  }
+  else {
     console.log("don't care");
     this.res.writeHead(200);
     this.res.end();
@@ -155,6 +164,35 @@ function generateLeaderBoardResponse(leaderboard) {
     botResponse += `  Likes: ${leaderboard[Object.keys(leaderboard)[i]].likes}\n`;
     botResponse += `  Likes given: ${leaderboard[Object.keys(leaderboard)[i]].likesGivenOut}\n`;
   }
+  sendResponse(botResponse);
+}
+
+function arrayToURLParam(locationArray) {
+  let urlParamString = '';
+  for (let i = 0; i < locationArray.length; i++) {
+    urlParamString += locationArray[i];
+    if (i < locationArray.length - 1) {
+      urlParamString += '+';
+    }
+  }
+  return urlParamString;
+}
+
+function getDirections(directionString) {
+  var directionStringArray = directionString.split(' ');
+  directionStringArray.shift();
+  directionStringArray.shift();
+  var beginningArray = [];
+  var destinationArray = [];
+  while (directionStringArray[0] !== 'to:') {
+    beginningArray.push(directionStringArray.shift());
+  }
+  directionStringArray.shift();
+  destinationArray = directionStringArray;
+  const beginningLocString = arrayToURLParam(beginningArray);
+  const destLocString = arrayToURLParam(destinationArray);
+  const googleUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${beginningLocString}&destination=${destLocString}&key=${process.env.MAP_KEY}`;
+  let botResponse = `googleURL = ${googleUrl}`;
   sendResponse(botResponse);
 }
 
