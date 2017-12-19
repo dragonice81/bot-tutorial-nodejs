@@ -5,7 +5,6 @@ var cool = require('cool-ascii-faces');
 var fs = require('fs');
 
 var botID = process.env.BOT_ID;
-botID = '678c500d5d216e077e520322bc';
 var _ = require('lodash');
 
 var options = {
@@ -26,7 +25,7 @@ function respond() {
       yeRegex = /^Ye\?|ye\?$/,
       gifRegex = /#[a-zA-Z ]+/,
       leaderRegex = /-leaderboard/;
-      directionsRegex = /directions from: ([0-9a-zA-Z .,]+) to: ([0-9a-zA-Z .,]+)/;
+      directionsRegex = /[dD]irections from: ([0-9a-zA-Z .,]+) [tT]o: ([0-9a-zA-Z .,]+)/;
 
   if (request.text && yeRegex.test(request.text)) {
     this.res.writeHead(200);
