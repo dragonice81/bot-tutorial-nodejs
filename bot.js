@@ -25,7 +25,7 @@ function respond() {
       yeRegex = /^Ye\?|ye\?$/,
       gifRegex = /#[a-zA-Z ]+/,
       leaderRegex = /-leaderboard/;
-      directionsRegex = /[dD]irections from: ([0-9a-zA-Z .,]+) [tT]o: ([0-9a-zA-Z .,]+)/;
+      directionsRegex = /[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/;
 
   if (request.text && yeRegex.test(request.text)) {
     this.res.writeHead(200);
@@ -183,7 +183,7 @@ function getDirections(directionString) {
   directionStringArray.shift();
   var beginningArray = [];
   var destinationArray = [];
-  while (directionStringArray[0] !== 'to:') {
+  while (directionStringArray[0] !== 'to:' || directionStringArray[0] !== 'to') {
     beginningArray.push(directionStringArray.shift());
   }
   directionStringArray.shift();
