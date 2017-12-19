@@ -199,7 +199,7 @@ function getDirections(directionString) {
       ${beginningLocString.replace('+', ' ')}
     to:
       ${destLocString.replace('+', ' ')}
-    It will take ${jsonResponse.routes[0].legs[0].duration} to travel ${jsonResponse.body.routes[0].legs[0].distance}
+    It will take ${jsonResponse.routes[0].legs[0].duration} to travel ${jsonResponse.routes[0].legs[0].distance}
     Click this to start navigation: maps.google.com`;    
     sendResponse(botResponse);
   });
