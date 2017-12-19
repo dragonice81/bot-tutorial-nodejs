@@ -197,7 +197,7 @@ function getDirections(directionString) {
     const urlShortenerUrl = `https://www.googleapis.com/urlshortener/v1/url?key=${process.env.URL_SHORT_KEY}`;
     const googleMapsUri = `https://www.google.com/maps/dir/${beginningLocString}/${destLocString}`;
     let shortGoogleMapsUri = request.post(urlShortenerUrl, {json: {longUrl: googleMapsUri}}, (response, body) => {
-      const shortUrl = JSON.parse(response.body).id;
+      const shortUrl = body.body.id;
       let botResponse =
       `Directions from:
   ${beginningLocString.replace(/[+]/g, ' ')}
