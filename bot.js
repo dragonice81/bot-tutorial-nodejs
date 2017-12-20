@@ -206,9 +206,11 @@ It will take ${jsonResponse.routes[0].legs[0].duration.text} to travel ${jsonRes
 
 Click this to start navigation: ${shortUrl}`;    
       sendResponse(botResponse);
-  
+	  return;
     });
+	return;
   });
+  return;
 }
 
 exports.respond = respond;
