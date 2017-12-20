@@ -200,7 +200,7 @@ function getDirections(directionString) {
     request.post(urlShortenerUrl, {json: {longUrl: googleMapsUri}}, (response, body) => {
       const shortUrl = body.body.id;
       let botResponse =
-      `Directions from: ${beginningLocString.replace(/[+]/g, ' ')} to: ${destLocString.replace(/[+]/g, ' ')}
+      `Directions to: ${destLocString.replace(/[+]/g, ' ')} from: ${beginningLocString.replace(/[+]/g, ' ')}
 
 It will take ${jsonResponse.routes[0].legs[0].duration.text} to travel ${jsonResponse.routes[0].legs[0].distance.text}
 
