@@ -5,7 +5,6 @@ var cool = require('cool-ascii-faces');
 var fs = require('fs');
 
 var botID = process.env.BOT_ID;
-botID = '678c500d5d216e077e520322bc';
 var _ = require('lodash');
 
 var options = {
@@ -200,7 +199,7 @@ function getDirections(directionString) {
     request.post(urlShortenerUrl, {json: {longUrl: googleMapsUri}}, (response, body) => {
       const shortUrl = body.body.id;
       let botResponse =
-      `Directions to: ${destLocString.replace(/[+]/g, ' ')} from: ${beginningLocString.replace(/[+]/g, ' ')}
+      `Directions to ${destLocString.replace(/[+]/g, ' ')} from ${beginningLocString.replace(/[+]/g, ' ')}
 
 It will take ${jsonResponse.routes[0].legs[0].duration.text} to travel ${jsonResponse.routes[0].legs[0].distance.text}
 
