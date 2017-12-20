@@ -193,8 +193,8 @@ function getDirections(directionString) {
   const destLocString = arrayToURLParam(destinationArray);
   const googleUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${beginningLocString}&destination=${destLocString}&key=${process.env.MAP_KEY}`;
   request(googleUrl, function (error, response, body) {
-	  console.log(body.body);
-    let jsonResponse = body.body;
+	 
+    const jsonResponse = JSON.parse(body);
     const urlShortenerUrl = `https://www.googleapis.com/urlshortener/v1/url?key=${process.env.URL_SHORT_KEY}`;
     const googleMapsUri = `https://www.google.com/maps/dir/${beginningLocString}/${destLocString}`;
     request.post(urlShortenerUrl, {json: {longUrl: googleMapsUri}}, (response, body) => {
