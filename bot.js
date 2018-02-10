@@ -33,7 +33,7 @@ function respond() {
     postMessage();
     this.res.end();
   }
-  else if (request.text $$ shadesRegex.test(request.text)) {
+  else if (request.text && shadesRegex.test(request.text)) {
 	  this.res.writeHead(200);
 	  gifTag('hot garbage');
 	  this.res.end();
