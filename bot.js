@@ -23,7 +23,8 @@ function respond() {
   var request = JSON.parse(this.req.chunks[0]),
   // var request = {text: '-leaderboard'},  
       yeRegex = /^Ye\?|ye\?$/,
-      gifRegex = /#[a-zA-Z ]+/,
+	  shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/,
+      gifRegex = /#[0-9a-zA-Z ]+/,
       leaderRegex = /-leaderboard/;
       directionsRegex = /[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/;
 
@@ -31,6 +32,11 @@ function respond() {
     this.res.writeHead(200);
     postMessage();
     this.res.end();
+  }
+  else if (request.text $$ shadesRegex.test(request.text)) {
+	  this.res.writeHead(200);
+	  gifTag('hot garbage');
+	  this.res.end();
   }
   else if (request.text && gifRegex.test(request.text)) {
     this.res.writeHead(200);
