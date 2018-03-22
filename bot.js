@@ -119,7 +119,7 @@ function gifTag(message) {
         sendResponse(botResponse);    
       }
       else {
-        gifTag('#garrett')
+        gifTag('#random')
       }
     } else {
       console.log(message + ' is invalid');
