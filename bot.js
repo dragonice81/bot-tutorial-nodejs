@@ -40,6 +40,7 @@ function respond() {
   }
   else if (request.text && gifRegex.test(request.text)) {
     this.res.writeHead(200);
+    console.log('gif requested');
     gifTag(request.text);
     this.res.end();
   }
@@ -111,9 +112,9 @@ function gifTag(message) {
 
   request('https://api.giphy.com/v1/gifs/search?q=' + message.split('#')[1].trim() + '&api_key=dc6zaTOxFJmzC&rating=r&limit=25', function (error, response, body) {
     parsedData = JSON.parse(body);
-    
+    console.log(`split msg: ${message.split('#')[1].trim()}`);
     if (!error && response.statusCode == 200 && parsedData && parsedData.data) {
-      if (giphyResponse) {
+      if (parsedData.data.length) {
         var giphyResponse = _.shuffle(parsedData.data);
         var botResponse = giphyResponse[0].images.downsized.url;
         sendResponse(botResponse);    
