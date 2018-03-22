@@ -27,7 +27,7 @@ function respond() {
       gifRegex = /#[0-9a-zA-Z ]+/,
       leaderRegex = /-leaderboard/;
       directionsRegex = /[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/;
-
+  console.log(request.text);
   if (request.text && yeRegex.test(request.text)) {
     this.res.writeHead(200);
     postMessage();
