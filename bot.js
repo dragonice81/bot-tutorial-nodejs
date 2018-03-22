@@ -109,13 +109,18 @@ function sendResponse(botResponse) {
 
 function gifTag(message) {
 
-  request('https://api.giphy.com/v1/gifs/search?q=' + message.substring(1).trim() + '&api_key=dc6zaTOxFJmzC&rating=r&limit=25', function (error, response, body) {
+  request('https://api.giphy.com/v1/gifs/search?q=' + message.split('#')[1].substring(1).trim() + '&api_key=dc6zaTOxFJmzC&rating=r&limit=25', function (error, response, body) {
     parsedData = JSON.parse(body);
     
     if (!error && response.statusCode == 200 && parsedData && parsedData.data) {
-      var giphyResponse = _.shuffle(parsedData.data);
-      var botResponse = giphyResponse[0].images.downsized.url;
-      sendResponse(botResponse);    
+      if (giphyResponse) {
+        var giphyResponse = _.shuffle(parsedData.data);
+        var botResponse = giphyResponse[0].images.downsized.url;
+        sendResponse(botResponse);    
+      }
+      else {
+        gifTag('#garrett')
+      }
     } else {
       console.log(message + ' is invalid');
     }
