@@ -125,7 +125,7 @@ function tellJoke() {
     const joke = _.shuffle(jokes)[0];
     sendResponse(joke);
   } else {
-    nodeRequest('https://icanhazdadjoke.com/', function (error, response, body) {
+    nodeRequest({url: 'https://icanhazdadjoke.com/', headers: {'Accept': 'application/json'}}, function (error, response, body) {
       parsedData = JSON.parse(body);
       if (parsedData.joke) {
         sendResponse(parsedData.joke)
