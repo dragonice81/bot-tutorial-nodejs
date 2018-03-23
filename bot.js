@@ -4,6 +4,7 @@ var nodeRequest = require('request');
 var cool = require('cool-ascii-faces');
 var fs = require('fs');
 var jokes = require('./jokes');
+const predict = require('eightball');
 
 var botID = process.env.BOT_ID;
 var _ = require('lodash');
@@ -29,6 +30,7 @@ function respond() {
       leaderRegex = /-leaderboard/;
       directionsRegex = /[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/;
       jokeRegex = /@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/;
+      eightBallRegex = /@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/;
   console.log(request.text);
   if (request.text && yeRegex.test(request.text)) {
     this.res.writeHead(200);
@@ -50,6 +52,12 @@ function respond() {
     this.res.writeHead(200);
     console.log('telling a joke');
     tellJoke();
+    this.res.end();
+  }
+  else if (request.text && eightBallRegex.test(request.text)) {
+    this.res.writeHead(200);
+    console.log('eight ball');
+    sendEightBallMsg();
     this.res.end();
   }
   else if (request.text && leaderRegex.test(request.text)) {
@@ -113,6 +121,10 @@ function sendResponse(botResponse) {
   botReq.end(JSON.stringify(body));
 
 
+}
+
+function sendEightBallMsg() {
+  sendResponse(predict());
 }
 
 function getRandomInt(max) {

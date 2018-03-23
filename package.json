@@ -11,7 +11,8 @@
     "cool-ascii-faces": "~1.3.x",
     "request": "2.83.0",
     "lodash": "4.17.4",
-    "shorturl": "0.0.3"
+    "shorturl": "0.0.3",
+    "eightball": "1.0.1"
   },
   "engines": {
     "node": "9.2.x"
