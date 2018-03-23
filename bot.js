@@ -1,9 +1,10 @@
 
 var HTTPS = require('https');
-var request = require('request');
+var nodeRequest = require('request');
 var cool = require('cool-ascii-faces');
 var fs = require('fs');
 var jokes = require('./jokes');
+const giveMeAJoke = require('give-me-a-joke');
 
 var botID = process.env.BOT_ID;
 var _ = require('lodash');
@@ -115,15 +116,32 @@ function sendResponse(botResponse) {
 
 }
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
 function tellJoke() {
-  const joke = _.shuffle(jokes);
-  sendResponse(joke[0]);
+  const randomInt = getRandomInt(496);
+  if (randomInt < 86) {
+    const joke = _.shuffle(jokes)[0];
+    sendResponse(joke);
+  } else {
+    nodeRequest('https://icanhazdadjoke.com/', function (error, response, body) {
+      parsedData = JSON.parse(body);
+      if (parsedData.joke) {
+        sendResponse(parsedData.joke)
+      } else {
+        const joke = _.shuffle(jokes)[0];
+        sendResponse(joke);    
+      }
+    });
+  }
 }
 
 
 function gifTag(message) {
 
-  request('https://api.giphy.com/v1/gifs/search?q=' + message.split('#')[1].trim() + '&api_key=dc6zaTOxFJmzC&rating=r&limit=25', function (error, response, body) {
+  nodeRequest('https://api.giphy.com/v1/gifs/search?q=' + message.split('#')[1].trim() + '&api_key=dc6zaTOxFJmzC&rating=r&limit=25', function (error, response, body) {
     parsedData = JSON.parse(body);
     console.log(`split msg: ${message.split('#')[1].trim()}`);
     if (!error && response.statusCode == 200 && parsedData && parsedData.data) {
@@ -145,7 +163,7 @@ function doLeaderboard() {
   var members = {};
   var leaderboard = {};
   var messages = [];
-  request('https://api.groupme.com/v3/groups/21255858?token=' + apiKey, function (error, response, body) {
+  nodeRequest('https://api.groupme.com/v3/groups/21255858?token=' + apiKey, function (error, response, body) {
     var parsedData = JSON.parse(body);
     if (!error && response.statusCode == 200 && parsedData && parsedData.response) {
       for (var i = 0; i < parsedData.response.members.length; i++) {
@@ -154,7 +172,7 @@ function doLeaderboard() {
         leaderboard['GarrettBot'] = {likes: 0, likesGivenOut: 0};
       }
     }
-    request('https://api.groupme.com/v3/groups/21255858/likes?period=month&token=' + apiKey, function (error, response, body) {
+    nodeRequest('https://api.groupme.com/v3/groups/21255858/likes?period=month&token=' + apiKey, function (error, response, body) {
       var parsedData = JSON.parse(body);
       if (!error && response.statusCode == 200 && parsedData && parsedData.response) {
         messages = parsedData.response.messages;
@@ -216,12 +234,12 @@ function getDirections(directionString) {
   const beginningLocString = arrayToURLParam(beginningArray);
   const destLocString = arrayToURLParam(destinationArray);
   const googleUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${beginningLocString}&destination=${destLocString}&key=${process.env.MAP_KEY}`;
-  request(googleUrl, function (error, response, body) {
+  nodeRequest(googleUrl, function (error, response, body) {
 	 
     const jsonResponse = JSON.parse(body);
     const urlShortenerUrl = `https://www.googleapis.com/urlshortener/v1/url?key=${process.env.URL_SHORT_KEY}`;
     const googleMapsUri = `https://www.google.com/maps/dir/${beginningLocString}/${destLocString}`;
-    request.post(urlShortenerUrl, {json: {longUrl: googleMapsUri}}, (response, body) => {
+    nodeRequest.post(urlShortenerUrl, {json: {longUrl: googleMapsUri}}, (response, body) => {
       const shortUrl = body.body.id;
       let botResponse =
       `Directions to ${destLocString.replace(/[+]/g, ' ')} from ${beginningLocString.replace(/[+]/g, ' ')}
