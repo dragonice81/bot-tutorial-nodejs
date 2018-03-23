@@ -3,6 +3,7 @@ var HTTPS = require('https');
 var request = require('request');
 var cool = require('cool-ascii-faces');
 var fs = require('fs');
+var jokes = require('./jokes');
 
 var botID = process.env.BOT_ID;
 var _ = require('lodash');
@@ -27,6 +28,7 @@ function respond() {
       gifRegex = /#[0-9a-zA-Z ]+/,
       leaderRegex = /-leaderboard/;
       directionsRegex = /[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/;
+      jokeRegex = /@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/;
   console.log(request.text);
   if (request.text && yeRegex.test(request.text)) {
     this.res.writeHead(200);
@@ -42,6 +44,12 @@ function respond() {
     this.res.writeHead(200);
     console.log('gif requested');
     gifTag(request.text);
+    this.res.end();
+  }
+  else if (request.text && jokeRegex.test(request.text)) {
+    this.res.writeHead(200);
+    console.log('telling a joke');
+    tellJoke();
     this.res.end();
   }
   else if (request.text && leaderRegex.test(request.text)) {
@@ -105,6 +113,11 @@ function sendResponse(botResponse) {
   botReq.end(JSON.stringify(body));
 
 
+}
+
+function tellJoke() {
+  const joke = _.shuffle(jokes);
+  sendResponse(joke[0]);
 }
 
 
