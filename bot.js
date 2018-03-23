@@ -4,7 +4,6 @@ var nodeRequest = require('request');
 var cool = require('cool-ascii-faces');
 var fs = require('fs');
 var jokes = require('./jokes');
-const giveMeAJoke = require('give-me-a-joke');
 
 var botID = process.env.BOT_ID;
 var _ = require('lodash');
