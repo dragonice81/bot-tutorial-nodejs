@@ -22,7 +22,7 @@ var messages = [];
 
 
 function respond() {
-  var request = JSON.parse(this.req.chunks[0]),
+  const request = JSON.parse(this.req.chunks[0]),
   // var request = {text: '-leaderboard'},  
       yeRegex = /^Ye\?|ye\?$/,
 	  shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/,
@@ -31,8 +31,14 @@ function respond() {
       directionsRegex = /[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/;
       jokeRegex = /@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/;
       eightBallRegex = /@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/;
+      urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/
   console.log(request.text);
-  if (request.text && yeRegex.test(request.text)) {
+  if (request.text && urlRegex.test(request.text)) {
+    console.log("don't care");
+    this.res.writeHead(200);
+    this.res.end();
+  }
+  else if (request.text && yeRegex.test(request.text)) {
     this.res.writeHead(200);
     postMessage();
     this.res.end();
