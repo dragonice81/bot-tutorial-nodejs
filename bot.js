@@ -4,7 +4,11 @@ const cool = require('cool-ascii-faces');
 const fs = require('fs');
 const jokes = require('./jokes');
 const predict = require('eightball');
-const { guy } = require('@flavortown/guy')
+const requestPro = require('request-promise-native');
+const delay = require('delay');
+const Markov = require('markov-strings');
+
+const messages = require('./messages');
 
 const botID = process.env.BOT_ID;
 const _ = require('lodash');
@@ -18,10 +22,8 @@ const options = {
 const members = {};
 const apiKey = process.env.API_KEY;
 
-const messages = [];
-
-
 function respond() {
+    const markov = new Markov(messages);
     const request = JSON.parse(this.req.chunks[0]);
     const yeRegex = /^Ye\?|ye\?$/;
     const shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/;
@@ -31,7 +33,6 @@ function respond() {
     const jokeRegex = /@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/;
     const eightBallRegex = /@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/;
     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
-    const flavorRegex = /[fF]lavor[tT]own/;
     console.log(request.text);
     if (request.text && urlRegex.test(request.text)) {
         console.log("don't care");
@@ -39,7 +40,10 @@ function respond() {
         this.res.end();
     } else if (request.text && yeRegex.test(request.text)) {
         this.res.writeHead(200);
-        postMessage();
+        // postMessage();
+        markov.buildCorpusSync();
+        const result = markov.generateSentenceSync();
+        sendResponse(result.string);
         this.res.end();
     } else if (request.text && shadesRegex.test(request.text)) {
 	  this.res.writeHead(200);
@@ -68,8 +72,6 @@ function respond() {
         this.res.writeHead(200);
         getDirections(request.text);
         this.res.end();
-    } else if (request.text && flavorRegex.test(request.text)) {
-        sendResponse(guy);
     } else {
         console.log("don't care");
         this.res.writeHead(200);
@@ -248,4 +250,45 @@ Click this to start navigation: ${shortUrl}`;
     });
 }
 
-exports.respond = respond;
+// async function scrape() {
+//     const url = 'https://api.groupme.com/v3/groups/messages?limit=100&token=';
+//     const messages = [];
+//     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
+//     const leaderRegex = /Leaderboard/;
+//     const garrettRegex = /@garrettbot/;
+//     // nodeRequest(url, (e, res, body) => {
+//     //     const response = JSON.parse(body).response
+//     //     for (let i = 0; i < response.messages.length; i++) {
+//     //         if (response.messages[i].text) {
+//     //             messages.push(response.messages[i].text);
+//     //         }
+//     //     }
+//     //     // for (let i = 0; i < rea)
+
+//     // });
+//     let lastMessageId = '';
+//     while(messages.length < 9800) {
+//         console.log('delaying');
+//         await delay(5000);
+//         console.log('finished delay');
+//         let response = await requestPro(`${url}${lastMessageId}`);
+//         response = JSON.parse(response).response;
+//         lastMessageId = `&before_id=${response.messages[99].id}`;
+//         for (let i = 0; i < response.messages.length; i++) {
+//             if (response.messages[i].text && !urlRegex.test(response.messages[i].text) && !leaderRegex.test(response.messages[i].text) && !garrettRegex.test(response.messages[i].text)) {
+//                 messages.push(response.messages[i].text);
+//             }
+//         }
+//         console.log(`current dict size: ${messages.length}`);    
+    
+//     }
+//     fs.writeFileSync('messages.json', JSON.stringify(messages));
+//     console.log(messages.length);    
+
+
+// }
+
+
+module.exports = {
+    respond
+}
