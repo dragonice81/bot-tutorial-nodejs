@@ -255,7 +255,7 @@ function createMarkovString() {
     const options = {
         maxLength: 140,
         minWords: 7,
-        minScorePerWord: score
+        minScore: score
     };
     const markov = new Markov(messages, options);
     markov.buildCorpusSync();
