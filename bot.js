@@ -1,10 +1,10 @@
-
 const HTTPS = require('https');
 const nodeRequest = require('request');
 const cool = require('cool-ascii-faces');
 const fs = require('fs');
 const jokes = require('./jokes');
 const predict = require('eightball');
+const { guy } = require('@flavortown/guy')
 
 const botID = process.env.BOT_ID;
 const _ = require('lodash');
@@ -22,16 +22,16 @@ const messages = [];
 
 
 function respond() {
-    const request = JSON.parse(this.req.chunks[0]),
-        // var request = {text: '-leaderboard'},
-        yeRegex = /^Ye\?|ye\?$/,
-	  shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/,
-        gifRegex = /#[0-9a-zA-Z ]+/,
-        leaderRegex = /-leaderboard/;
-    directionsRegex = /[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/;
-    jokeRegex = /@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/;
-    eightBallRegex = /@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/;
-    urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
+    const request = JSON.parse(this.req.chunks[0]);
+    const yeRegex = /^Ye\?|ye\?$/;
+    const shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/;
+    const gifRegex = /#[0-9a-zA-Z ]+/;
+    const leaderRegex = /-leaderboard/;
+    const directionsRegex = /[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/;
+    const jokeRegex = /@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/;
+    const eightBallRegex = /@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/;
+    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
+    const flavorRegex = /[fF]lavor[tT]own/;
     console.log(request.text);
     if (request.text && urlRegex.test(request.text)) {
         console.log("don't care");
@@ -68,6 +68,8 @@ function respond() {
         this.res.writeHead(200);
         getDirections(request.text);
         this.res.end();
+    } else if (request.text && flavorRegex.test(request.text)) {
+        sendResponse(guy);
     } else {
         console.log("don't care");
         this.res.writeHead(200);
@@ -102,8 +104,7 @@ function sendResponse(botResponse) {
         bot_id: botID,
         text: botResponse
     };
-    let botReq;
-    botReq = HTTPS.request(options, (res) => {
+    const botReq = HTTPS.request(options, (res) => {
         if (res.statusCode == 202) {
             // neat
         } else {
@@ -124,14 +125,11 @@ function sendEightBallMsg() {
     sendResponse(predict());
 }
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
-}
 
 function tellJoke() {
-    const randomInt = getRandomInt(496);
+    const randomInt = _.random(496);
     if (randomInt < 86) {
-        const joke = _.shuffle(jokes)[0];
+        const joke = _.sample(jokes);
         sendResponse(joke);
     } else {
         nodeRequest({url: 'https://icanhazdadjoke.com/', headers: {Accept: 'application/json'}}, (error, response, body) => {
@@ -139,7 +137,7 @@ function tellJoke() {
             if (parsedData.joke) {
                 sendResponse(parsedData.joke);
             } else {
-                const joke = _.shuffle(jokes)[0];
+                const joke = _.sample(jokes);
                 sendResponse(joke);
             }
         });
@@ -149,12 +147,12 @@ function tellJoke() {
 
 function gifTag(message) {
     nodeRequest(`https://api.giphy.com/v1/gifs/search?q=${message.split('#')[1].trim()}&api_key=dc6zaTOxFJmzC&rating=r&limit=25`, (error, response, body) => {
-        parsedData = JSON.parse(body);
+        const parsedData = JSON.parse(body);
         console.log(`split msg: ${message.split('#')[1].trim()}`);
-        if (!error && response.statusCode == 200 && parsedData && parsedData.data) {
+        if (!error && response.statusCode === 200 && parsedData && parsedData.data) {
             if (parsedData.data.length) {
-                const giphyResponse = _.shuffle(parsedData.data);
-                const botResponse = giphyResponse[0].images.downsized.url;
+                const giphyResponse = _.sample(parsedData.data);
+                const botResponse = giphyResponse.images.downsized.url;
                 sendResponse(botResponse);
             } else {
                 gifTag('#random');
