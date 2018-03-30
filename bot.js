@@ -4,8 +4,6 @@ const cool = require('cool-ascii-faces');
 const fs = require('fs');
 const jokes = require('./jokes');
 const predict = require('eightball');
-const requestPro = require('request-promise-native');
-const delay = require('delay');
 const Markov = require('markov-strings');
 
 const messages = require('./messages');
