@@ -63,11 +63,11 @@ function respond() {
         this.res.writeHead(200);
         // doLeaderboard();
         this.res.end();
-    } else if (request.text && directionsRegex.test(request.text)) {
+    } else if (request.text && markovRegex.test(request.text)) {
         this.res.writeHead(200);
         createMarkovString();
         this.res.end();
-    } else if (request.text && markovRegex.test(request.text)) {
+    } else if (request.text && directionsRegex.test(request.text)) {
         this.res.writeHead(200);
         getDirections(request.text);
         this.res.end();
