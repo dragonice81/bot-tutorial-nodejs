@@ -21,7 +21,12 @@ const members = {};
 const apiKey = process.env.API_KEY;
 
 function respond() {
-    const markov = new Markov(messages);
+    const options = {
+        maxLength: 140,
+        minWords: 10,
+        minScore: 25
+    };
+    const markov = new Markov(messages, options);
     const request = JSON.parse(this.req.chunks[0]);
     const yeRegex = /^Ye\?|ye\?$/;
     const shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/;
