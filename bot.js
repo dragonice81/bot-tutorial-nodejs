@@ -21,14 +21,9 @@ const members = {};
 const apiKey = process.env.API_KEY;
 
 function respond() {
-    const options = {
-        maxLength: 140,
-        minWords: 7,
-        minScore: 100
-    };
-    const markov = new Markov(messages, options);
     const request = JSON.parse(this.req.chunks[0]);
     const yeRegex = /^Ye\?|ye\?$/;
+    const markovRegex = /@?[gG]((arrett)|(urt))[bB]ot,? talk to me/;
     const shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/;
     const gifRegex = /#[0-9a-zA-Z ]+/;
     const leaderRegex = /-leaderboard/;
@@ -43,10 +38,7 @@ function respond() {
         this.res.end();
     } else if (request.text && yeRegex.test(request.text)) {
         this.res.writeHead(200);
-        // postMessage();
-        markov.buildCorpusSync();
-        const result = markov.generateSentenceSync();
-        sendResponse(result.string);
+        postMessage();
         this.res.end();
     } else if (request.text && shadesRegex.test(request.text)) {
 	  this.res.writeHead(200);
@@ -69,12 +61,17 @@ function respond() {
         this.res.end();
     } else if (request.text && leaderRegex.test(request.text)) {
         this.res.writeHead(200);
-        doLeaderboard();
+        // doLeaderboard();
         this.res.end();
     } else if (request.text && directionsRegex.test(request.text)) {
         this.res.writeHead(200);
+        createMarkovString();
+        this.res.end();
+    } else if (request.text && markovRegex.test(request.text)) {
+        this.res.writeHead(200);
         getDirections(request.text);
         this.res.end();
+
     } else {
         console.log("don't care");
         this.res.writeHead(200);
@@ -251,6 +248,20 @@ Click this to start navigation: ${shortUrl}`;
             sendResponse(botResponse);
         });
     });
+}
+
+function createMarkovString() {
+    score = _.random(100);
+    const options = {
+        maxLength: 140,
+        minWords: 7,
+        minScorePerWord: score
+    };
+    const markov = new Markov(messages, options);
+    markov.buildCorpusSync();
+    const result = markov.generateSentenceSync();
+    console.log(`minScore: ${score}`);
+    sendResponse(result.string);
 }
 
 // async function scrape() {
