@@ -68,6 +68,7 @@ function respond() {
         createMarkovString();
         this.res.end();
     } else if (request.text && directionsRegex.test(request.text)) {
+        messages.push(request.text);
         this.res.writeHead(200);
         getDirections(request.text);
         this.res.end();
