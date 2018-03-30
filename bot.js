@@ -23,8 +23,8 @@ const apiKey = process.env.API_KEY;
 function respond() {
     const options = {
         maxLength: 140,
-        minWords: 10,
-        minScore: 25
+        minWords: 7,
+        minScore: 100
     };
     const markov = new Markov(messages, options);
     const request = JSON.parse(this.req.chunks[0]);
