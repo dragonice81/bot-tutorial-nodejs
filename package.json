@@ -16,7 +16,8 @@
     "eightball": "1.0.1",
     "markov-strings": "1.4.0",
     "express": "4.16.3",
-    "get-port": "3.2.0"
+    "get-port": "3.2.0",
+    "body-parser": "1.18.2"
   },
   "devDependencies": {
     "eslint": "3.17.1",

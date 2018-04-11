@@ -1,10 +1,16 @@
 const express = require('express');
 const getPort = require('get-port');
+const bodyParser = require('body-parser');
 const bot = require('./bot.js');
 
 const app = express();
 
 const defaultPort = Number(process.env.PORT || 5000);
+
+// json bodyParser
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json({limit: '512mb'}));
+
 
 // routes
 app.post('/', bot.respond());

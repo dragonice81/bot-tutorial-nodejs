@@ -189,6 +189,7 @@ const createMarkovString = () => {
 };
 
 const respond = (req, res) => {
+    console.log(req);
     const request = JSON.parse(req.body);
     const yeRegex = /^Ye\?|ye\?$/;
     const markovRegex = /@?[gG]((arrett)|(urt))[bB]ot,? talk to me/;
