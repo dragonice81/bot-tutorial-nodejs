@@ -130,13 +130,14 @@ function sendEightBallMsg() {
 
 function tellJoke() {
     if (_.filter((jokes, {said: false})).length === 0) {
+        console.log('no jokes found');
         for (let i = 0; i < jokes.length; i++) {
             jokes[i].said = false;
         }
     }
     const joke = _.sample(_.filter(jokes, {said: false}));
     jokes[_.findIndex(jokes, joke)].said = true;
-    console.log(_.sample(_.filter(jokes, {said: true})).length);
+    console.log(_.filter(jokes, {said: true}).length);
     sendResponse(joke.joke);
 }
 
