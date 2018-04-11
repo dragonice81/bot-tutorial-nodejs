@@ -5,7 +5,6 @@ const fs = require('fs');
 const jokes = require('./jokes');
 const predict = require('eightball');
 const Markov = require('markov-strings');
-
 const messages = require('./messages');
 
 const botID = process.env.BOT_ID;
@@ -130,23 +129,15 @@ function sendEightBallMsg() {
 
 
 function tellJoke() {
-    const randomInt = _.random(496);
-    if (randomInt < 86) {
-        const joke = _.sample(jokes);
-        sendResponse(joke);
-    } else {
-        nodeRequest({url: 'https://icanhazdadjoke.com/', headers: {Accept: 'application/json'}}, (error, response, body) => {
-            parsedData = JSON.parse(body);
-            if (parsedData.joke) {
-                sendResponse(parsedData.joke);
-            } else {
-                const joke = _.sample(jokes);
-                sendResponse(joke);
-            }
-        });
+    if (_.filter((jokes, {said: false})).length === 0) {
+        for (let i = 0; i < jokes.length; i++) {
+            jokes[i].said = false;
+        }
     }
+    const joke = _.sample(_.filter(jokes, {said: false}));
+    jokes[_.findIndex(jokes, joke)].said = true;
+    sendResponse(joke);
 }
-
 
 function gifTag(message) {
     nodeRequest(`https://api.giphy.com/v1/gifs/search?q=${message.split('#')[1].trim()}&api_key=dc6zaTOxFJmzC&rating=r&limit=25`, (error, response, body) => {
@@ -266,8 +257,8 @@ function createMarkovString() {
 }
 
 // async function scrape() {
-//     const url = 'https://api.groupme.com/v3/groups/messages?limit=100&token=';
-//     const messages = [];
+//     const url = 'https://icanhazdadjoke.com/search?limit=30&page=';
+//     const jokes = [];
 //     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
 //     const leaderRegex = /Leaderboard/;
 //     const garrettRegex = /@garrettbot/;
@@ -281,24 +272,31 @@ function createMarkovString() {
 //     //     // for (let i = 0; i < rea)
 
 //     // });
-//     let lastMessageId = '';
-//     while(messages.length < 9800) {
+//     let page = 1;
+//     for (let i = 1; i <= 15; i++) {
 //         console.log('delaying');
 //         await delay(5000);
 //         console.log('finished delay');
-//         let response = await requestPro(`${url}${lastMessageId}`);
-//         response = JSON.parse(response).response;
-//         lastMessageId = `&before_id=${response.messages[99].id}`;
-//         for (let i = 0; i < response.messages.length; i++) {
-//             if (response.messages[i].text && !urlRegex.test(response.messages[i].text) && !leaderRegex.test(response.messages[i].text) && !garrettRegex.test(response.messages[i].text)) {
-//                 messages.push(response.messages[i].text);
+//         const options = {
+//             uri: `${url}${i}`,
+//             headers: {
+//                 Accept: 'application/json'
 //             }
 //         }
-//         console.log(`current dict size: ${messages.length}`);    
+//         console.log(options.uri);
+//         let response = await requestPro(options);
+//         response = JSON.parse(response);
+//         console.log(response.results);
+//         for (let j = 0; j < response.results.length; j++) {
+//             if (response.results[j]) {
+//                 jokes.push(response.results[j].joke);
+//             }
+//         }
+//         console.log(`current joke size: ${jokes.length}`);    
     
 //     }
-//     fs.writeFileSync('messages.json', JSON.stringify(messages));
-//     console.log(messages.length);    
+//     fs.writeFileSync('jokes.json', JSON.stringify(jokes));
+//     console.log(jokes.length);    
 
 
 // }
