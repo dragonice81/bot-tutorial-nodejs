@@ -137,7 +137,6 @@ function tellJoke() {
     }
     const joke = _.sample(_.filter(jokes, ['said', false]));
     jokes[_.findIndex(jokes, joke)].said = true;
-    console.log(_.filter(jokes, ['said', true]).length);
     sendResponse(joke.joke);
 }
 
