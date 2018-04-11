@@ -136,7 +136,8 @@ function tellJoke() {
     }
     const joke = _.sample(_.filter(jokes, {said: false}));
     jokes[_.findIndex(jokes, joke)].said = true;
-    sendResponse(joke);
+    console.log(_.sample(_.filter(jokes, {said: true})).length);
+    sendResponse(joke.joke);
 }
 
 function gifTag(message) {
