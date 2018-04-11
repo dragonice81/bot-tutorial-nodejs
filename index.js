@@ -1,37 +1,21 @@
-const http = require('http');
-const director = require('director');
+const express = require('express');
+const getPort = require('get-port');
 const bot = require('./bot.js');
 
-function ping() {
-    const ye = '@garrettbot #jay cutler';
-    const regex = /@garrettbot #[a-zA-Z ]+/;
-    if (regex.test(ye)) {
-        this.res.writeHead(200);
-        this.res.end('ye');
-    } else {
-        this.res.writeHead(200);
-        this.res.end('ye');
-    }
-}
+const app = express();
 
-const router = new director.http.Router({
-    '/': {
-        post: bot.respond,
-        get: ping
-    }
-});
+const defaultPort = Number(process.env.PORT || 5000);
 
-const server = http.createServer((req, res) => {
-    req.chunks = [];
-    req.on('data', (chunk) => {
-        req.chunks.push(chunk.toString());
-    });
+// routes
+app.post('/', bot.respond());
 
-    router.dispatch(req, res, (err) => {
-        res.writeHead(err.status, {'Content-Type': 'text/plain'});
-        res.end(err.message);
+getPort(defaultPort).then((port) => {
+    app.listen(port, async () => {
+        console.log(`listening on port ${port}`);
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`Navigate to http://localhost:${port} to use the application`); // eslint-disable-line no-console
+        }
     });
 });
 
-const port = Number(process.env.PORT || 5000);
-server.listen(port);
+module.exports = app;

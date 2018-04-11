@@ -188,8 +188,8 @@ const createMarkovString = () => {
     sendResponse(result.string);
 };
 
-const respond = () => {
-    const request = JSON.parse(this.req.chunks[0]);
+const respond = (req, res) => {
+    const request = JSON.parse(this.req.body);
     const yeRegex = /^Ye\?|ye\?$/;
     const markovRegex = /@?[gG]((arrett)|(urt))[bB]ot,? talk to me/;
     const shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/;
@@ -251,7 +251,7 @@ const respond = () => {
             console.log("don't care");
             this.res.writeHead(200);
             this.res.end();
-        }    
+        }
     } catch (e) {
         sendResponse(e.message, true);
     }
