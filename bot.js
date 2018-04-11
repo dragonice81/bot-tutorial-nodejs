@@ -1,14 +1,13 @@
 const HTTPS = require('https');
 const nodeRequest = require('request');
 const cool = require('cool-ascii-faces');
-const fs = require('fs');
 const jokes = require('./jokes');
 const predict = require('eightball');
 const Markov = require('markov-strings');
 const messages = require('./messages');
-
-const botID = process.env.BOT_ID;
 const _ = require('lodash');
+
+const mainBotID = process.env.BOT_ID;
 
 const options = {
     hostname: 'api.groupme.com',
@@ -16,96 +15,8 @@ const options = {
     method: 'POST'
 };
 
-const members = {};
-const apiKey = process.env.API_KEY;
-
-function respond() {
-    const request = JSON.parse(this.req.chunks[0]);
-    const yeRegex = /^Ye\?|ye\?$/;
-    const markovRegex = /@?[gG]((arrett)|(urt))[bB]ot,? talk to me/;
-    const shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/;
-    const gifRegex = /#[0-9a-zA-Z ]+/;
-    const leaderRegex = /-leaderboard/;
-    const directionsRegex = /[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/;
-    const jokeRegex = /@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/;
-    const jokeRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? joke/;
-    const eightBallRegex = /@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/;
-    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
-    console.log(request.text);
-    if (request.text && urlRegex.test(request.text)) {
-        console.log("don't care");
-        this.res.writeHead(200);
-        this.res.end();
-    } else if (request.text && yeRegex.test(request.text)) {
-        this.res.writeHead(200);
-        postMessage();
-        this.res.end();
-    } else if (request.text && shadesRegex.test(request.text)) {
-	  this.res.writeHead(200);
-	  gifTag('hot garbage');
-	  this.res.end();
-    } else if (request.text && gifRegex.test(request.text)) {
-        this.res.writeHead(200);
-        console.log('gif requested');
-        gifTag(request.text);
-        this.res.end();
-    } else if (request.text && jokeRegex.test(request.text)) {
-        this.res.writeHead(200);
-        console.log('telling a joke');
-        tellJoke();
-        this.res.end();
-    } else if (request.text && jokeRegex2.test(request.text)) {
-        this.res.writeHead(200);
-        console.log('telling a joke');
-        tellJoke();
-        this.res.end();
-    } else if (request.text && eightBallRegex.test(request.text)) {
-        this.res.writeHead(200);
-        console.log('eight ball');
-        sendEightBallMsg();
-        this.res.end();
-    } else if (request.text && leaderRegex.test(request.text)) {
-        this.res.writeHead(200);
-        // doLeaderboard();
-        this.res.end();
-    } else if (request.text && markovRegex.test(request.text)) {
-        this.res.writeHead(200);
-        createMarkovString();
-        this.res.end();
-    } else if (request.text && directionsRegex.test(request.text)) {
-        messages.push(request.text);
-        this.res.writeHead(200);
-        getDirections(request.text);
-        this.res.end();
-
-    } else {
-        console.log("don't care");
-        this.res.writeHead(200);
-        this.res.end();
-    }
-}
-
-function randomInt(low, high) {
-    return Math.floor(Math.random() * (high - low) + low);
-}
-
-function postMessage() {
-    let botResponse,
-        body,
-        botReq;
-
-    botResponse = cool();
-
-    const number = randomInt(1, 101);
-    if (number >= 90) {
-        botResponse = 'nerr';
-    } else {
-        botResponse = 'ye';
-    }
-    sendResponse(botResponse);
-}
-
-function sendResponse(botResponse) {
+const sendResponse = (botResponse, error) => {
+    const botID = error ? process.env.BOT_ID_TEST : mainBotID;
     console.log(`sending ${botResponse} to ${botID}`);
 
     const body = {
@@ -113,7 +24,7 @@ function sendResponse(botResponse) {
         text: botResponse
     };
     const botReq = HTTPS.request(options, (res) => {
-        if (res.statusCode == 202) {
+        if (res.statusCode === 202) {
             // neat
         } else {
             console.log(`rejecting bad status code ${res.statusCode}`);
@@ -127,26 +38,40 @@ function sendResponse(botResponse) {
         console.log(`timeout posting message ${JSON.stringify(err)}`);
     });
     botReq.end(JSON.stringify(body));
-}
+};
 
-function sendEightBallMsg() {
+const postMessage = () => {
+    let botResponse;
+
+    botResponse = cool();
+
+    const number = _.random(1, 101);
+    if (number >= 90) {
+        botResponse = 'nerr';
+    } else {
+        botResponse = 'ye';
+    }
+    sendResponse(botResponse);
+};
+
+const sendEightBallMsg = () => {
     sendResponse(predict());
-}
+};
 
 
-function tellJoke() {
+const tellJoke = () => {
     if (_.filter((jokes, ['said', false])).length === 0) {
         console.log('no jokes found');
-        for (let i = 0; i < jokes.length; i++) {
+        for (let i = 0; i < jokes.length; i += 1) {
             jokes[i].said = false;
         }
     }
     const joke = _.sample(_.filter(jokes, ['said', false]));
     jokes[_.findIndex(jokes, joke)].said = true;
     sendResponse(joke.joke);
-}
+};
 
-function gifTag(message) {
+const gifTag = (message) => {
     nodeRequest(`https://api.giphy.com/v1/gifs/search?q=${message.split('#')[1].trim()}&api_key=dc6zaTOxFJmzC&rating=r&limit=25`, (error, response, body) => {
         const parsedData = JSON.parse(body);
         console.log(`split msg: ${message.split('#')[1].trim()}`);
@@ -162,63 +87,63 @@ function gifTag(message) {
             console.log(`${message} is invalid`);
         }
     });
-}
+};
 
-function doLeaderboard() {
-    const members = {};
-    const leaderboard = {};
-    let messages = [];
-    nodeRequest(`https://api.groupme.com/v3/groups/21255858?token=${apiKey}`, (error, response, body) => {
-        const parsedData = JSON.parse(body);
-        if (!error && response.statusCode == 200 && parsedData && parsedData.response) {
-            for (let i = 0; i < parsedData.response.members.length; i++) {
-                members[parsedData.response.members[i].user_id] = parsedData.response.members[i].nickname;
-                leaderboard[parsedData.response.members[i].nickname] = {likes: 0, likesGivenOut: 0};
-                leaderboard.GarrettBot = {likes: 0, likesGivenOut: 0};
-            }
-        }
-        nodeRequest(`https://api.groupme.com/v3/groups/21255858/likes?period=month&token=${apiKey}`, (error, response, body) => {
-            const parsedData = JSON.parse(body);
-            if (!error && response.statusCode == 200 && parsedData && parsedData.response) {
-                messages = parsedData.response.messages;
-                // console.log(parsedData.response);
-            }
-            for (let j = 0; j < messages.length; j++) {
-                message = messages[j];
-                // console.log(message);
-                leaderboard[message.name].likes += message.favorited_by.length;
-                for (let i = 0; i < message.favorited_by.length; i++) {
-                    leaderboard[members[message.favorited_by[i]]].likesGivenOut++;
-                }
-            }
+// function doLeaderboard() {
+//     const members = {};
+//     const leaderboard = {};
+//     let messages = [];
+//     nodeRequest(`https://api.groupme.com/v3/groups/21255858?token=${apiKey}`, (error, response, body) => {
+//         const parsedData = JSON.parse(body);
+//         if (!error && response.statusCode == 200 && parsedData && parsedData.response) {
+//             for (let i = 0; i < parsedData.response.members.length; i++) {
+//                 members[parsedData.response.members[i].user_id] = parsedData.response.members[i].nickname;
+//                 leaderboard[parsedData.response.members[i].nickname] = {likes: 0, likesGivenOut: 0};
+//                 leaderboard.GarrettBot = {likes: 0, likesGivenOut: 0};
+//             }
+//         }
+//         nodeRequest(`https://api.groupme.com/v3/groups/21255858/likes?period=month&token=${apiKey}`, (error, response, body) => {
+//             const parsedData = JSON.parse(body);
+//             if (!error && response.statusCode == 200 && parsedData && parsedData.response) {
+//                 messages = parsedData.response.messages;
+//                 // console.log(parsedData.response);
+//             }
+//             for (let j = 0; j < messages.length; j++) {
+//                 message = messages[j];
+//                 // console.log(message);
+//                 leaderboard[message.name].likes += message.favorited_by.length;
+//                 for (let i = 0; i < message.favorited_by.length; i++) {
+//                     leaderboard[members[message.favorited_by[i]]].likesGivenOut++;
+//                 }
+//             }
 
-            console.log(leaderboard);
-            generateLeaderBoardResponse(leaderboard);
-        });
-    });
-}
-function generateLeaderBoardResponse(leaderboard) {
-    let botResponse = 'Leaderboard:\n';
-    for (let i = 0; i < Object.keys(leaderboard).length; i++) {
-        botResponse += `${Object.keys(leaderboard)[i]}:\n`;
-        botResponse += `  Likes: ${leaderboard[Object.keys(leaderboard)[i]].likes}\n`;
-        botResponse += `  Likes given: ${leaderboard[Object.keys(leaderboard)[i]].likesGivenOut}\n`;
-    }
-    sendResponse(botResponse);
-}
+//             console.log(leaderboard);
+//             generateLeaderBoardResponse(leaderboard);
+//         });
+//     });
+// }
+// function generateLeaderBoardResponse(leaderboard) {
+//     let botResponse = 'Leaderboard:\n';
+//     for (let i = 0; i < Object.keys(leaderboard).length; i++) {
+//         botResponse += `${Object.keys(leaderboard)[i]}:\n`;
+//         botResponse += `  Likes: ${leaderboard[Object.keys(leaderboard)[i]].likes}\n`;
+//         botResponse += `  Likes given: ${leaderboard[Object.keys(leaderboard)[i]].likesGivenOut}\n`;
+//     }
+//     sendResponse(botResponse);
+// }
 
-function arrayToURLParam(locationArray) {
+const arrayToURLParam = (locationArray) => {
     let urlParamString = '';
-    for (let i = 0; i < locationArray.length; i++) {
+    for (let i = 0; i < locationArray.length; i += 1) {
         urlParamString += locationArray[i];
         if (i < locationArray.length - 1) {
             urlParamString += '+';
         }
     }
     return urlParamString;
-}
+};
 
-function getDirections(directionString) {
+const getDirections = (directionString) => {
     const directionStringArray = directionString.split(' ');
     directionStringArray.shift();
     directionStringArray.shift();
@@ -247,21 +172,91 @@ Click this to start navigation: ${shortUrl}`;
             sendResponse(botResponse);
         });
     });
-}
+};
 
-function createMarkovString() {
-    score = _.random(100);
-    const options = {
+const createMarkovString = () => {
+    const score = _.random(100);
+    const markovOptions = {
         maxLength: 140,
         minWords: 7,
         minScore: score
     };
-    const markov = new Markov(messages, options);
+    const markov = new Markov(messages, markovOptions);
     markov.buildCorpusSync();
     const result = markov.generateSentenceSync();
     console.log(`minScore: ${score}`);
     sendResponse(result.string);
-}
+};
+
+const respond = () => {
+    const request = JSON.parse(this.req.chunks[0]);
+    const yeRegex = /^Ye\?|ye\?$/;
+    const markovRegex = /@?[gG]((arrett)|(urt))[bB]ot,? talk to me/;
+    const shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/;
+    const gifRegex = /#[0-9a-zA-Z ]+/;
+    const leaderRegex = /-leaderboard/;
+    const directionsRegex = /[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/;
+    const jokeRegex = /@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/;
+    const jokeRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? joke/;
+    const eightBallRegex = /@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/;
+    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
+    console.log(request.text);
+    try {
+        if (request.text && urlRegex.test(request.text)) {
+            console.log("don't care");
+            this.res.writeHead(200);
+            this.res.end();
+        } else if (request.text && yeRegex.test(request.text)) {
+            this.res.writeHead(200);
+            postMessage();
+            this.res.end();
+        } else if (request.text && shadesRegex.test(request.text)) {
+            this.res.writeHead(200);
+            gifTag('hot garbage');
+            this.res.end();
+        } else if (request.text && gifRegex.test(request.text)) {
+            this.res.writeHead(200);
+            console.log('gif requested');
+            gifTag(request.text);
+            this.res.end();
+        } else if (request.text && jokeRegex.test(request.text)) {
+            this.res.writeHead(200);
+            console.log('telling a joke');
+            tellJoke();
+            this.res.end();
+        } else if (request.text && jokeRegex2.test(request.text)) {
+            this.res.writeHead(200);
+            console.log('telling a joke');
+            tellJoke();
+            this.res.end();
+        } else if (request.text && eightBallRegex.test(request.text)) {
+            this.res.writeHead(200);
+            console.log('eight ball');
+            sendEightBallMsg();
+            this.res.end();
+        } else if (request.text && leaderRegex.test(request.text)) {
+            this.res.writeHead(200);
+            // doLeaderboard();
+            this.res.end();
+        } else if (request.text && markovRegex.test(request.text)) {
+            this.res.writeHead(200);
+            createMarkovString();
+            this.res.end();
+        } else if (request.text && directionsRegex.test(request.text)) {
+            messages.push(request.text);
+            this.res.writeHead(200);
+            getDirections(request.text);
+            this.res.end();
+        } else {
+            console.log("don't care");
+            this.res.writeHead(200);
+            this.res.end();
+        }    
+    } catch (e) {
+        sendResponse(e.message, true);
+    }
+};
+
 
 // async function scrape() {
 //     const url = 'https://icanhazdadjoke.com/search?limit=30&page=';
@@ -299,11 +294,11 @@ function createMarkovString() {
 //                 jokes.push(response.results[j].joke);
 //             }
 //         }
-//         console.log(`current joke size: ${jokes.length}`);    
-    
+//         console.log(`current joke size: ${jokes.length}`);
+
 //     }
 //     fs.writeFileSync('jokes.json', JSON.stringify(jokes));
-//     console.log(jokes.length);    
+//     console.log(jokes.length);
 
 
 // }
@@ -311,4 +306,4 @@ function createMarkovString() {
 
 module.exports = {
     respond
-}
+};

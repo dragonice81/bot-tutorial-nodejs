@@ -5,9 +5,7 @@ const bot = require('./bot.js');
 function ping() {
     const ye = '@garrettbot #jay cutler';
     const regex = /@garrettbot #[a-zA-Z ]+/;
-    let retval;
     if (regex.test(ye)) {
-        retval = ye.substring(13).trim();
         this.res.writeHead(200);
         this.res.end('ye');
     } else {
@@ -33,8 +31,6 @@ const server = http.createServer((req, res) => {
         res.writeHead(err.status, {'Content-Type': 'text/plain'});
         res.end(err.message);
     });
-
-
 });
 
 const port = Number(process.env.PORT || 5000);
