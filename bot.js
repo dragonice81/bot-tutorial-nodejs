@@ -28,6 +28,7 @@ function respond() {
     const leaderRegex = /-leaderboard/;
     const directionsRegex = /[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/;
     const jokeRegex = /@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/;
+    const jokeRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? joke/;
     const eightBallRegex = /@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/;
     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
     console.log(request.text);
@@ -49,6 +50,11 @@ function respond() {
         gifTag(request.text);
         this.res.end();
     } else if (request.text && jokeRegex.test(request.text)) {
+        this.res.writeHead(200);
+        console.log('telling a joke');
+        tellJoke();
+        this.res.end();
+    } else if (request.text && jokeRegex2.test(request.text)) {
         this.res.writeHead(200);
         console.log('telling a joke');
         tellJoke();
