@@ -6,6 +6,7 @@ const predict = require('eightball');
 const Markov = require('markov-strings');
 const messages = require('./messages');
 const _ = require('lodash');
+const wrap = require('./middleware/error-catcher');
 
 const mainBotID = process.env.BOT_ID;
 
@@ -188,9 +189,9 @@ const createMarkovString = () => {
     sendResponse(result.string);
 };
 
-const respond = (req, res) => {
-    console.log(req);
-    const request = JSON.parse(req.body);
+const respond = () => wrap(async (req, res) => {
+    console.log(req.body);
+    const request = req.body;
     const yeRegex = /^Ye\?|ye\?$/;
     const markovRegex = /@?[gG]((arrett)|(urt))[bB]ot,? talk to me/;
     const shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/;
@@ -205,58 +206,58 @@ const respond = (req, res) => {
     try {
         if (request.text && urlRegex.test(request.text)) {
             console.log("don't care");
-            this.res.writeHead(200);
-            this.res.end();
+            res.writeHead(200);
+            res.end();
         } else if (request.text && yeRegex.test(request.text)) {
-            this.res.writeHead(200);
+            res.writeHead(200);
             postMessage();
-            this.res.end();
+            res.end();
         } else if (request.text && shadesRegex.test(request.text)) {
-            this.res.writeHead(200);
+            res.writeHead(200);
             gifTag('hot garbage');
-            this.res.end();
+            res.end();
         } else if (request.text && gifRegex.test(request.text)) {
-            this.res.writeHead(200);
+            res.writeHead(200);
             console.log('gif requested');
             gifTag(request.text);
-            this.res.end();
+            res.end();
         } else if (request.text && jokeRegex.test(request.text)) {
-            this.res.writeHead(200);
+            res.writeHead(200);
             console.log('telling a joke');
             tellJoke();
-            this.res.end();
+            res.end();
         } else if (request.text && jokeRegex2.test(request.text)) {
-            this.res.writeHead(200);
+            res.writeHead(200);
             console.log('telling a joke');
             tellJoke();
-            this.res.end();
+            res.end();
         } else if (request.text && eightBallRegex.test(request.text)) {
-            this.res.writeHead(200);
+            res.writeHead(200);
             console.log('eight ball');
             sendEightBallMsg();
-            this.res.end();
+            res.end();
         } else if (request.text && leaderRegex.test(request.text)) {
-            this.res.writeHead(200);
+            res.writeHead(200);
             // doLeaderboard();
-            this.res.end();
+            res.end();
         } else if (request.text && markovRegex.test(request.text)) {
-            this.res.writeHead(200);
+            res.writeHead(200);
             createMarkovString();
-            this.res.end();
+            res.end();
         } else if (request.text && directionsRegex.test(request.text)) {
             messages.push(request.text);
-            this.res.writeHead(200);
+            res.writeHead(200);
             getDirections(request.text);
-            this.res.end();
+            res.end();
         } else {
             console.log("don't care");
-            this.res.writeHead(200);
-            this.res.end();
+            res.writeHead(200);
+            res.end();
         }
     } catch (e) {
         sendResponse(e.message, true);
     }
-};
+});
 
 
 // async function scrape() {
