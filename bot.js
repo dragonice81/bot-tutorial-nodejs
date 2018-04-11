@@ -10,35 +10,16 @@ const wrap = require('./middleware/error-catcher');
 
 const mainBotID = process.env.BOT_ID;
 
-const options = {
-    hostname: 'api.groupme.com',
-    path: '/v3/bots/post',
-    method: 'POST'
-};
 
-const sendResponse = (botResponse, error) => {
-    const botID = error ? process.env.BOT_ID_TEST : mainBotID;
+const sendResponse = async (botResponse, error) => {
+    // const botID = error ? process.env.BOT_ID_TEST : mainBotID;
+    const botID = '678c500d5d216e077e520322bc';
     console.log(`sending ${botResponse} to ${botID}`);
-
     const body = {
         bot_id: botID,
         text: botResponse
     };
-    const botReq = HTTPS.request(options, (res) => {
-        if (res.statusCode === 202) {
-            // neat
-        } else {
-            console.log(`rejecting bad status code ${res.statusCode}`);
-        }
-    });
-
-    botReq.on('error', (err) => {
-        console.log(`error posting message ${JSON.stringify(err)}`);
-    });
-    botReq.on('timeout', (err) => {
-        console.log(`timeout posting message ${JSON.stringify(err)}`);
-    });
-    botReq.end(JSON.stringify(body));
+    await nodeRequest.post('https://api.groupme.com/v3/bots/post/', {body: JSON.stringify(body)});
 };
 
 const postMessage = () => {
@@ -55,12 +36,12 @@ const postMessage = () => {
     sendResponse(botResponse);
 };
 
-const sendEightBallMsg = () => {
-    sendResponse(predict());
+const sendEightBallMsg = async () => {
+    await sendResponse(predict());
 };
 
 
-const tellJoke = () => {
+const tellJoke = async () => {
     if (_.filter((jokes, ['said', false])).length === 0) {
         console.log('no jokes found');
         for (let i = 0; i < jokes.length; i += 1) {
@@ -69,25 +50,30 @@ const tellJoke = () => {
     }
     const joke = _.sample(_.filter(jokes, ['said', false]));
     jokes[_.findIndex(jokes, joke)].said = true;
-    sendResponse(joke.joke);
+    await sendResponse(joke.joke);
 };
 
-const gifTag = (message) => {
-    nodeRequest(`https://api.giphy.com/v1/gifs/search?q=${message.split('#')[1].trim()}&api_key=dc6zaTOxFJmzC&rating=r&limit=25`, (error, response, body) => {
-        const parsedData = JSON.parse(body);
+const gifTag = async (message) => {
+    // try {
+        const parsedData = await nodeRequest.get(`https://api.giphy.com/v1/gifs/search?q=${message.split('#')[1].trim()}&api_key=dc6zaTOxFJmzC&rating=r&limit=25`);
         console.log(`split msg: ${message.split('#')[1].trim()}`);
-        if (!error && response.statusCode === 200 && parsedData && parsedData.data) {
+        console.log(parsedData);
+        if (parsedData && parsedData.data) {
             if (parsedData.data.length) {
                 const giphyResponse = _.sample(parsedData.data);
                 const botResponse = giphyResponse.images.downsized.url;
-                sendResponse(botResponse);
+                await sendResponse(botResponse);
             } else {
-                gifTag('#random');
+                console.log(parsedData);
             }
         } else {
             console.log(`${message} is invalid`);
+            // await gifTag('#random');
         }
-    });
+    // } catch (e) {
+    //     console.log(`${message} is invalid`);
+    //     await gifTag('#random');
+    // }
 };
 
 // function doLeaderboard() {
@@ -206,56 +192,48 @@ const respond = () => wrap(async (req, res) => {
     try {
         if (request.text && urlRegex.test(request.text)) {
             console.log("don't care");
-            res.writeHead(200);
-            res.end();
+            res.send('didn\'t do anything');
         } else if (request.text && yeRegex.test(request.text)) {
-            res.writeHead(200);
             postMessage();
-            res.end();
+            res.send('did the ye thing');
         } else if (request.text && shadesRegex.test(request.text)) {
-            res.writeHead(200);
-            gifTag('hot garbage');
-            res.end();
+            await gifTag('hot garbage');
+            res.send('50 shades thing');
         } else if (request.text && gifRegex.test(request.text)) {
-            res.writeHead(200);
             console.log('gif requested');
             gifTag(request.text);
-            res.end();
+            res.send('sent a gif');
         } else if (request.text && jokeRegex.test(request.text)) {
-            res.writeHead(200);
             console.log('telling a joke');
             tellJoke();
-            res.end();
+            res.send('sent a joke');
         } else if (request.text && jokeRegex2.test(request.text)) {
-            res.writeHead(200);
             console.log('telling a joke');
             tellJoke();
-            res.end();
+            res.send('sent a joke');
         } else if (request.text && eightBallRegex.test(request.text)) {
-            res.writeHead(200);
             console.log('eight ball');
             sendEightBallMsg();
-            res.end();
+            res.send('sent an 8 ball thing');
         } else if (request.text && leaderRegex.test(request.text)) {
             res.writeHead(200);
             // doLeaderboard();
-            res.end();
+            res.send('don\'t care');
         } else if (request.text && markovRegex.test(request.text)) {
-            res.writeHead(200);
             createMarkovString();
-            res.end();
+            res.send('markov');
         } else if (request.text && directionsRegex.test(request.text)) {
-            messages.push(request.text);
-            res.writeHead(200);
             getDirections(request.text);
-            res.end();
+            res.send('directions');
         } else {
+            messages.push(request.text);
             console.log("don't care");
-            res.writeHead(200);
-            res.end();
+            res.send('dont care');
         }
     } catch (e) {
-        sendResponse(e.message, true);
+        await sendResponse(e.message, true);
+        res.status(400);
+        res.send(e.message);
     }
 });
 
