@@ -1,5 +1,5 @@
-const HTTPS = require('https');
-const nodeRequest = require('request');
+/* eslint linebreak-style: 0 */
+const request = require('request-promise-native');
 const cool = require('cool-ascii-faces');
 const jokes = require('./jokes');
 const predict = require('eightball');
@@ -12,17 +12,16 @@ const mainBotID = process.env.BOT_ID;
 
 
 const sendResponse = async (botResponse, error) => {
-    // const botID = error ? process.env.BOT_ID_TEST : mainBotID;
-    const botID = '678c500d5d216e077e520322bc';
+    const botID = error ? process.env.BOT_ID_TEST : mainBotID;
     console.log(`sending ${botResponse} to ${botID}`);
     const body = {
         bot_id: botID,
         text: botResponse
     };
-    await nodeRequest.post('https://api.groupme.com/v3/bots/post/', {body: JSON.stringify(body)});
+    await request.post('https://api.groupme.com/v3/bots/post/', {body: JSON.stringify(body)});
 };
 
-const postMessage = () => {
+const postMessage = async () => {
     let botResponse;
 
     botResponse = cool();
@@ -33,7 +32,7 @@ const postMessage = () => {
     } else {
         botResponse = 'ye';
     }
-    sendResponse(botResponse);
+    await sendResponse(botResponse);
 };
 
 const sendEightBallMsg = async () => {
@@ -54,10 +53,10 @@ const tellJoke = async () => {
 };
 
 const gifTag = async (message) => {
-    // try {
-        const parsedData = await nodeRequest.get(`https://api.giphy.com/v1/gifs/search?q=${message.split('#')[1].trim()}&api_key=dc6zaTOxFJmzC&rating=r&limit=25`);
+    try {
+        const parsedData = JSON.parse(await request.get(`https://api.giphy.com/v1/gifs/search?q=${message.split('#')[1].trim()}&api_key=dc6zaTOxFJmzC&rating=r&limit=25`));
+
         console.log(`split msg: ${message.split('#')[1].trim()}`);
-        console.log(parsedData);
         if (parsedData && parsedData.data) {
             if (parsedData.data.length) {
                 const giphyResponse = _.sample(parsedData.data);
@@ -67,13 +66,12 @@ const gifTag = async (message) => {
                 console.log(parsedData);
             }
         } else {
-            console.log(`${message} is invalid`);
-            // await gifTag('#random');
+            console.log(`No gifs for ${message}`);
+            await gifTag('#random');
         }
-    // } catch (e) {
-    //     console.log(`${message} is invalid`);
-    //     await gifTag('#random');
-    // }
+    } catch (e) {
+        console.log(`gifTag error: ${e}`);
+    }
 };
 
 // function doLeaderboard() {
@@ -130,7 +128,7 @@ const arrayToURLParam = (locationArray) => {
     return urlParamString;
 };
 
-const getDirections = (directionString) => {
+const getDirections = async (directionString) => {
     const directionStringArray = directionString.split(' ');
     directionStringArray.shift();
     directionStringArray.shift();
@@ -144,24 +142,21 @@ const getDirections = (directionString) => {
     const beginningLocString = arrayToURLParam(beginningArray);
     const destLocString = arrayToURLParam(destinationArray);
     const googleUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${beginningLocString}&destination=${destLocString}&key=${process.env.MAP_KEY}`;
-    nodeRequest(googleUrl, (error, response, body) => {
-        const jsonResponse = JSON.parse(body);
-        const urlShortenerUrl = `https://www.googleapis.com/urlshortener/v1/url?key=${process.env.URL_SHORT_KEY}`;
-        const googleMapsUri = `https://www.google.com/maps/dir/${beginningLocString}/${destLocString}`;
-        nodeRequest.post(urlShortenerUrl, {json: {longUrl: googleMapsUri}}, (response, body) => {
-            const shortUrl = body.body.id;
-            const botResponse =
+    const response = JSON.parse(await request.get(googleUrl));
+    const urlShortenerUrl = `https://www.googleapis.com/urlshortener/v1/url?key=${process.env.URL_SHORT_KEY}`;
+    const googleMapsUri = `https://www.google.com/maps/dir/${beginningLocString}/${destLocString}`;
+    const shortenerResponse = await request.post(urlShortenerUrl, {json: {longUrl: googleMapsUri}});
+    const shortUrl = shortenerResponse.id;
+    const botResponse =
       `Directions to ${destLocString.replace(/[+]/g, ' ')} from ${beginningLocString.replace(/[+]/g, ' ')}
 
-It will take ${jsonResponse.routes[0].legs[0].duration.text} to travel ${jsonResponse.routes[0].legs[0].distance.text}
+It will take ${response.routes[0].legs[0].duration.text} to travel ${response.routes[0].legs[0].distance.text}
 
 Click this to start navigation: ${shortUrl}`;
-            sendResponse(botResponse);
-        });
-    });
+    await sendResponse(botResponse);
 };
 
-const createMarkovString = () => {
+const createMarkovString = async () => {
     const score = _.random(100);
     const markovOptions = {
         maxLength: 140,
@@ -169,15 +164,14 @@ const createMarkovString = () => {
         minScore: score
     };
     const markov = new Markov(messages, markovOptions);
-    markov.buildCorpusSync();
-    const result = markov.generateSentenceSync();
+    await markov.buildCorpus();
+    const result = await markov.generateSentence();
     console.log(`minScore: ${score}`);
-    sendResponse(result.string);
+    await sendResponse(result.string);
 };
 
 const respond = () => wrap(async (req, res) => {
-    console.log(req.body);
-    const request = req.body;
+    const message = req.body;
     const yeRegex = /^Ye\?|ye\?$/;
     const markovRegex = /@?[gG]((arrett)|(urt))[bB]ot,? talk to me/;
     const shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/;
@@ -188,45 +182,45 @@ const respond = () => wrap(async (req, res) => {
     const jokeRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? joke/;
     const eightBallRegex = /@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/;
     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
-    console.log(request.text);
+    console.log(message.text);
     try {
-        if (request.text && urlRegex.test(request.text)) {
+        if (message.text && urlRegex.test(message.text)) {
             console.log("don't care");
             res.send('didn\'t do anything');
-        } else if (request.text && yeRegex.test(request.text)) {
+        } else if (message.text && yeRegex.test(message.text)) {
             postMessage();
             res.send('did the ye thing');
-        } else if (request.text && shadesRegex.test(request.text)) {
+        } else if (message.text && shadesRegex.test(message.text)) {
             await gifTag('hot garbage');
             res.send('50 shades thing');
-        } else if (request.text && gifRegex.test(request.text)) {
+        } else if (message.text && gifRegex.test(message.text)) {
             console.log('gif requested');
-            gifTag(request.text);
+            gifTag(message.text);
             res.send('sent a gif');
-        } else if (request.text && jokeRegex.test(request.text)) {
+        } else if (message.text && jokeRegex.test(message.text)) {
             console.log('telling a joke');
             tellJoke();
             res.send('sent a joke');
-        } else if (request.text && jokeRegex2.test(request.text)) {
+        } else if (message.text && jokeRegex2.test(message.text)) {
             console.log('telling a joke');
             tellJoke();
             res.send('sent a joke');
-        } else if (request.text && eightBallRegex.test(request.text)) {
+        } else if (message.text && eightBallRegex.test(message.text)) {
             console.log('eight ball');
             sendEightBallMsg();
             res.send('sent an 8 ball thing');
-        } else if (request.text && leaderRegex.test(request.text)) {
+        } else if (message.text && leaderRegex.test(message.text)) {
             res.writeHead(200);
             // doLeaderboard();
             res.send('don\'t care');
-        } else if (request.text && markovRegex.test(request.text)) {
+        } else if (message.text && markovRegex.test(message.text)) {
             createMarkovString();
             res.send('markov');
-        } else if (request.text && directionsRegex.test(request.text)) {
-            getDirections(request.text);
+        } else if (message.text && directionsRegex.test(message.text)) {
+            getDirections(message.text);
             res.send('directions');
         } else {
-            messages.push(request.text);
+            messages.push(message.text);
             console.log("don't care");
             res.send('dont care');
         }
