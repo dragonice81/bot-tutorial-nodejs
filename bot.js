@@ -1,13 +1,15 @@
-/* eslint linebreak-style: 0 */
 const request = require('request-promise-native');
 const cool = require('cool-ascii-faces');
-const jokes = require('./jokes');
+let videos = require('./videos');
 const predict = require('eightball');
 const Markov = require('markov-strings');
 const messages = require('./messages');
 const _ = require('lodash');
 const wrap = require('./middleware/error-catcher');
+let jokes = require('./jokes');
 
+let saidJokes = [];
+let saidVideos = [];
 const mainBotID = process.env.BOT_ID;
 
 
@@ -39,16 +41,37 @@ const sendEightBallMsg = async () => {
     await sendResponse(predict());
 };
 
+const sendVideo = async () => {
+    if (videos.length === 0) {
+        console.log('no songs found');
+        for (let i = 0; i < saidVideos.length; i += 1) {
+            saidVideos[i].said = true;
+        }
+        videos = saidVideos;
+        saidVideos = [];
+    }
+    const video = _.sample(videos);
+    const index = _.indexOf(videos, video);
+    _.pullAt(videos, index);
+    video.said = true;
+    saidVideos.push(video);
+    await sendResponse(video.video);
+};
 
 const tellJoke = async () => {
-    if (_.filter((jokes, ['said', false])).length === 0) {
+    if (jokes.length === 0) {
         console.log('no jokes found');
-        for (let i = 0; i < jokes.length; i += 1) {
-            jokes[i].said = false;
+        for (let i = 0; i < saidJokes.length; i += 1) {
+            saidJokes[i].said = true;
         }
+        jokes = saidJokes;
+        saidJokes = [];
     }
-    const joke = _.sample(_.filter(jokes, ['said', false]));
-    jokes[_.findIndex(jokes, joke)].said = true;
+    const joke = _.sample(jokes);
+    const index = _.indexOf(jokes, joke);
+    _.pullAt(jokes, index);
+    joke.said = true;
+    saidJokes.push(jokes);
     await sendResponse(joke.joke);
 };
 
@@ -73,49 +96,6 @@ const gifTag = async (message) => {
         console.log(`gifTag error: ${e}`);
     }
 };
-
-// function doLeaderboard() {
-//     const members = {};
-//     const leaderboard = {};
-//     let messages = [];
-//     nodeRequest(`https://api.groupme.com/v3/groups/21255858?token=${apiKey}`, (error, response, body) => {
-//         const parsedData = JSON.parse(body);
-//         if (!error && response.statusCode == 200 && parsedData && parsedData.response) {
-//             for (let i = 0; i < parsedData.response.members.length; i++) {
-//                 members[parsedData.response.members[i].user_id] = parsedData.response.members[i].nickname;
-//                 leaderboard[parsedData.response.members[i].nickname] = {likes: 0, likesGivenOut: 0};
-//                 leaderboard.GarrettBot = {likes: 0, likesGivenOut: 0};
-//             }
-//         }
-//         nodeRequest(`https://api.groupme.com/v3/groups/21255858/likes?period=month&token=${apiKey}`, (error, response, body) => {
-//             const parsedData = JSON.parse(body);
-//             if (!error && response.statusCode == 200 && parsedData && parsedData.response) {
-//                 messages = parsedData.response.messages;
-//                 // console.log(parsedData.response);
-//             }
-//             for (let j = 0; j < messages.length; j++) {
-//                 message = messages[j];
-//                 // console.log(message);
-//                 leaderboard[message.name].likes += message.favorited_by.length;
-//                 for (let i = 0; i < message.favorited_by.length; i++) {
-//                     leaderboard[members[message.favorited_by[i]]].likesGivenOut++;
-//                 }
-//             }
-
-//             console.log(leaderboard);
-//             generateLeaderBoardResponse(leaderboard);
-//         });
-//     });
-// }
-// function generateLeaderBoardResponse(leaderboard) {
-//     let botResponse = 'Leaderboard:\n';
-//     for (let i = 0; i < Object.keys(leaderboard).length; i++) {
-//         botResponse += `${Object.keys(leaderboard)[i]}:\n`;
-//         botResponse += `  Likes: ${leaderboard[Object.keys(leaderboard)[i]].likes}\n`;
-//         botResponse += `  Likes given: ${leaderboard[Object.keys(leaderboard)[i]].likesGivenOut}\n`;
-//     }
-//     sendResponse(botResponse);
-// }
 
 const arrayToURLParam = (locationArray) => {
     let urlParamString = '';
@@ -182,6 +162,8 @@ const respond = () => wrap(async (req, res) => {
     const jokeRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? joke/;
     const eightBallRegex = /@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/;
     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
+    const musicRegex =  /@?[gG]((arrett)|(urt))[bB]ot,? give me a song/;
+    const musicRegex2 =  /@?[gG]((arrett)|(urt))[bB]ot,? song/;
     console.log(message.text);
     try {
         if (message.text && urlRegex.test(message.text)) {
@@ -195,29 +177,32 @@ const respond = () => wrap(async (req, res) => {
             res.send('50 shades thing');
         } else if (message.text && gifRegex.test(message.text)) {
             console.log('gif requested');
-            gifTag(message.text);
+            await gifTag(message.text);
             res.send('sent a gif');
         } else if (message.text && jokeRegex.test(message.text)) {
             console.log('telling a joke');
-            tellJoke();
+            await tellJoke();
             res.send('sent a joke');
         } else if (message.text && jokeRegex2.test(message.text)) {
             console.log('telling a joke');
-            tellJoke();
+            await tellJoke();
             res.send('sent a joke');
         } else if (message.text && eightBallRegex.test(message.text)) {
             console.log('eight ball');
-            sendEightBallMsg();
+            await sendEightBallMsg();
             res.send('sent an 8 ball thing');
         } else if (message.text && leaderRegex.test(message.text)) {
             res.writeHead(200);
             // doLeaderboard();
             res.send('don\'t care');
         } else if (message.text && markovRegex.test(message.text)) {
-            createMarkovString();
+            await createMarkovString();
             res.send('markov');
         } else if (message.text && directionsRegex.test(message.text)) {
-            getDirections(message.text);
+            await getDirections(message.text);
+            res.send('directions');
+        } else if (message.text && (musicRegex.test(message.text) || musicRegex2.test(message.text))) {
+            await sendVideo();
             res.send('directions');
         } else {
             messages.push(message.text);
@@ -230,53 +215,6 @@ const respond = () => wrap(async (req, res) => {
         res.send(e.message);
     }
 });
-
-
-// async function scrape() {
-//     const url = 'https://icanhazdadjoke.com/search?limit=30&page=';
-//     const jokes = [];
-//     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
-//     const leaderRegex = /Leaderboard/;
-//     const garrettRegex = /@garrettbot/;
-//     // nodeRequest(url, (e, res, body) => {
-//     //     const response = JSON.parse(body).response
-//     //     for (let i = 0; i < response.messages.length; i++) {
-//     //         if (response.messages[i].text) {
-//     //             messages.push(response.messages[i].text);
-//     //         }
-//     //     }
-//     //     // for (let i = 0; i < rea)
-
-//     // });
-//     let page = 1;
-//     for (let i = 1; i <= 15; i++) {
-//         console.log('delaying');
-//         await delay(5000);
-//         console.log('finished delay');
-//         const options = {
-//             uri: `${url}${i}`,
-//             headers: {
-//                 Accept: 'application/json'
-//             }
-//         }
-//         console.log(options.uri);
-//         let response = await requestPro(options);
-//         response = JSON.parse(response);
-//         console.log(response.results);
-//         for (let j = 0; j < response.results.length; j++) {
-//             if (response.results[j]) {
-//                 jokes.push(response.results[j].joke);
-//             }
-//         }
-//         console.log(`current joke size: ${jokes.length}`);
-
-//     }
-//     fs.writeFileSync('jokes.json', JSON.stringify(jokes));
-//     console.log(jokes.length);
-
-
-// }
-
 
 module.exports = {
     respond
