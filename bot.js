@@ -217,5 +217,6 @@ const respond = () => wrap(async (req, res) => {
 });
 
 module.exports = {
-    respond
+    respond,
+    sendResponse
 };
