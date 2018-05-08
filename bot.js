@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 const request = require('request-promise-native');
 const cool = require('cool-ascii-faces');
 let videos = require('./videos');
@@ -252,6 +253,5 @@ const respond = () => wrap(async (req, res) => {
 
 module.exports = {
     respond,
-    sendResponse,
-    sendCompliment
+    sendResponse
 };
