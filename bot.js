@@ -242,7 +242,7 @@ const respond = () => wrap(async (req, res) => {
             await sendComplimentOrInsult(message.text);
             res.send('compliment');
         } else if (message.text && randomNumberRegex.test(message.text)) {
-            await sendResponse(_.random(100));
+            await sendResponse(`${_.random(100)}`);
             res.send('compliment');
         } else {
             messages.push(message.text);
