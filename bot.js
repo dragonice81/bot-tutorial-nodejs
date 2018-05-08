@@ -7,10 +7,14 @@ const messages = require('./messages');
 const _ = require('lodash');
 const wrap = require('./middleware/error-catcher');
 let jokes = require('./jokes');
+const users = require('./users');
+const insults = require('./insults');
+const compliments = require('./compliments');
 
 let saidJokes = [];
 let saidVideos = [];
 const mainBotID = process.env.BOT_ID;
+let taylorCompFlag = true;
 
 
 const sendResponse = async (botResponse, error) => {
@@ -150,6 +154,31 @@ const createMarkovString = async () => {
     await sendResponse(result.string);
 };
 
+const extractNameFromMessage = (message) => {
+    for (let i = 0; i < users.length; i += 1) {
+        if (message.toLowerCase().includes(users[i].toLowerCase())) {
+            return `@${users[i]}, `;
+        }
+    }
+    return '';
+};
+
+const sendComplimentOrInsult = async (message) => {
+    const complimentflag = message.toLowerCase().includes('compliment');
+    const name = extractNameFromMessage(message);
+    let response;
+    if (complimentflag) {
+        response = `${name}${_.sample(compliments)}`;
+        if (name.includes('Taylor') && taylorCompFlag) {
+            response = `${name} people may say you're 649 years old, but I don't think you look a day over 273`;
+            taylorCompFlag = false;
+        }
+    } else {
+        response = `${name}${_.sample(insults)}`;
+    }
+    await sendResponse(response);
+};
+
 const respond = () => wrap(async (req, res) => {
     const message = req.body;
     const yeRegex = /^Ye\?|ye\?$/;
@@ -162,8 +191,10 @@ const respond = () => wrap(async (req, res) => {
     const jokeRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? joke/;
     const eightBallRegex = /@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/;
     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
-    const musicRegex =  /@?[gG]((arrett)|(urt))[bB]ot,? give me a song/;
-    const musicRegex2 =  /@?[gG]((arrett)|(urt))[bB]ot,? song/;
+    const musicRegex = /@?[gG]((arrett)|(urt))[bB]ot,? give me a song/;
+    const musicRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? song/;
+    const complimentRegex = /@?[gG]((arrett)|(urt))[bB]ot,? ((compliment)|(insult)) [a-zA-Z]+/;
+    const complimentRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/;
     console.log(message.text);
     try {
         if (message.text && urlRegex.test(message.text)) {
@@ -203,7 +234,10 @@ const respond = () => wrap(async (req, res) => {
             res.send('directions');
         } else if (message.text && (musicRegex.test(message.text) || musicRegex2.test(message.text))) {
             await sendVideo();
-            res.send('directions');
+            res.send('video');
+        } else if (message.text && (complimentRegex.test(message.text) || complimentRegex2.test(message.text))) {
+            await sendComplimentOrInsult(message.text);
+            res.send('compliment');
         } else {
             messages.push(message.text);
             console.log("don't care");
@@ -218,5 +252,6 @@ const respond = () => wrap(async (req, res) => {
 
 module.exports = {
     respond,
-    sendResponse
+    sendResponse,
+    sendCompliment
 };
