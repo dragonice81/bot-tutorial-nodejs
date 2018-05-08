@@ -156,8 +156,9 @@ const createMarkovString = async () => {
 };
 
 const extractNameFromMessage = (message) => {
+    const splitMessage = message.toLowerCase().split(' ');
     for (let i = 0; i < users.length; i += 1) {
-        if (message.toLowerCase().includes(users[i].toLowerCase())) {
+        if (splitMessage.includes(users[i].toLowerCase())) {
             return `@${users[i]}, `;
         }
     }
@@ -196,6 +197,7 @@ const respond = () => wrap(async (req, res) => {
     const musicRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? song/;
     const complimentRegex = /@?[gG]((arrett)|(urt))[bB]ot,? ((compliment)|(insult)) [a-zA-Z]+/;
     const complimentRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/;
+    const randomNumberRegex = /@?[gG]((arrett)|(urt))[bB]ot,? random number/;
     console.log(message.text);
     try {
         if (message.text && urlRegex.test(message.text)) {
@@ -238,6 +240,9 @@ const respond = () => wrap(async (req, res) => {
             res.send('video');
         } else if (message.text && (complimentRegex.test(message.text) || complimentRegex2.test(message.text))) {
             await sendComplimentOrInsult(message.text);
+            res.send('compliment');
+        } else if (message.text && randomNumberRegex.test(message.text)) {
+            await sendResponse(_.random(100));
             res.send('compliment');
         } else {
             messages.push(message.text);
