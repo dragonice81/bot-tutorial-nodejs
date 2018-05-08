@@ -29,7 +29,6 @@ schedule.scheduleJob(cronString420, async () => {
 
 getPort(defaultPort).then((port) => {
     app.listen(port, async () => {
-        console.log(await bot.sendCompliment('Taylor compliment'));
         console.log(`listening on port ${port}`);
         if (process.env.NODE_ENV === 'development') {
             console.log(`Navigate to http://localhost:${port} to use the application`); // eslint-disable-line no-console
