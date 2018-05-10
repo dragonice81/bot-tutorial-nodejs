@@ -32,7 +32,7 @@ const sendResponse = async (botResponse, error) => {
         bot_id: botID,
         text: botResponse.response
     };
-    await setTimeout(50);
+    await setTimeout(() => { console.log('waiting'); }, 50);
     await request.post('https://api.groupme.com/v3/bots/post/', {body: JSON.stringify(body)});
 };
 
