@@ -16,9 +16,9 @@ let saidJokes = [];
 let saidVideos = [];
 
 const getBotId = (groupId) => {
-    if (groupId === 21255858) {
+    if (+groupId === 21255858) {
         return process.env.BROM_BOT_ID;
-    } else if (groupId === 39437389) {
+    } else if (+groupId === 39437389) {
         return process.env.AMERICA_BOT_ID;
     }
     return undefined;
