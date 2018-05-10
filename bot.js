@@ -15,7 +15,6 @@ const compliments = require('./compliments');
 let saidJokes = [];
 let saidVideos = [];
 const mainBotID = process.env.BOT_ID;
-let taylorCompFlag = true;
 
 
 const sendResponse = async (botResponse, error) => {
@@ -156,9 +155,12 @@ const createMarkovString = async () => {
 };
 
 const extractNameFromMessage = (message) => {
-    const splitMessage = message.toLowerCase().split(' ');
+    const splitMessage = message.text.toLowerCase().split(' ');
     for (let i = 0; i < users.length; i += 1) {
         if (splitMessage.includes(users[i].toLowerCase())) {
+            if (users[i] === 'Me') {
+                return `@${message.name}`;
+            }
             return `@${users[i]}, `;
         }
     }
@@ -171,10 +173,6 @@ const sendComplimentOrInsult = async (message) => {
     let response;
     if (complimentflag) {
         response = `${name}${_.sample(compliments)}`;
-        if (name.includes('Taylor') && taylorCompFlag) {
-            response = `${name} people may say you're 649 years old, but I don't think you look a day over 273`;
-            taylorCompFlag = false;
-        }
     } else {
         response = `${name}${_.sample(insults)}`;
     }
@@ -239,7 +237,7 @@ const respond = () => wrap(async (req, res) => {
             await sendVideo();
             res.send('video');
         } else if (message.text && (complimentRegex.test(message.text) || complimentRegex2.test(message.text))) {
-            await sendComplimentOrInsult(message.text);
+            await sendComplimentOrInsult(message);
             res.send('compliment');
         } else if (message.text && randomNumberRegex.test(message.text)) {
             await sendResponse(`${_.random(100)}`);
