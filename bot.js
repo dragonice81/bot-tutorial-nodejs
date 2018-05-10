@@ -168,7 +168,7 @@ const extractNameFromMessage = (message) => {
 };
 
 const sendComplimentOrInsult = async (message) => {
-    const complimentflag = message.toLowerCase().includes('compliment');
+    const complimentflag = message.text.toLowerCase().includes('compliment');
     const name = extractNameFromMessage(message);
     let response;
     if (complimentflag) {
