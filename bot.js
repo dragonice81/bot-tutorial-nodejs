@@ -14,38 +14,48 @@ const compliments = require('./compliments');
 
 let saidJokes = [];
 let saidVideos = [];
-const mainBotID = process.env.BOT_ID;
 
+const getBotId = (groupId) => {
+    if (groupId === 21255858) {
+        return process.env.BROM_BOT_ID;
+    } else if (groupId === 39437389) {
+        return process.env.AMERICA_BOT_ID;
+    }
+    return undefined;
+};
 
 const sendResponse = async (botResponse, error) => {
-    const botID = error ? process.env.BOT_ID_TEST : mainBotID;
-    console.log(`sending ${botResponse} to ${botID}`);
+    const messageBotId = getBotId(botResponse.group_id);
+    const botID = error || !messageBotId ? process.env.BOT_ID_TEST : messageBotId;
+    console.log(`sending ${botResponse.response} to ${botID}`);
     const body = {
         bot_id: botID,
-        text: botResponse
+        text: botResponse.response
     };
+    await setTimeout(50);
     await request.post('https://api.groupme.com/v3/bots/post/', {body: JSON.stringify(body)});
 };
 
-const postMessage = async () => {
-    let botResponse;
+const postMessage = async (message) => {
+    let response;
 
-    botResponse = cool();
+    response = cool();
 
     const number = _.random(1, 101);
     if (number >= 90) {
-        botResponse = 'nerr';
+        response = 'nerr';
     } else {
-        botResponse = 'ye';
+        response = 'ye';
     }
-    await sendResponse(botResponse);
+    await sendResponse({response, group_id: message.group_id});
 };
 
-const sendEightBallMsg = async () => {
-    await sendResponse(predict());
+const sendEightBallMsg = async (message) => {
+    const response = predict();
+    await sendResponse({response, group_id: message.group_id});
 };
 
-const sendVideo = async () => {
+const sendVideo = async (message) => {
     if (videos.length === 0) {
         console.log('no songs found');
         for (let i = 0; i < saidVideos.length; i += 1) {
@@ -59,10 +69,10 @@ const sendVideo = async () => {
     _.pullAt(videos, index);
     video.said = true;
     saidVideos.push(video);
-    await sendResponse(video.video);
+    await sendResponse({response: video.video, group_id: message.group_id});
 };
 
-const tellJoke = async () => {
+const tellJoke = async (message) => {
     if (jokes.length === 0) {
         console.log('no jokes found');
         for (let i = 0; i < saidJokes.length; i += 1) {
@@ -76,24 +86,24 @@ const tellJoke = async () => {
     _.pullAt(jokes, index);
     joke.said = true;
     saidJokes.push(jokes);
-    await sendResponse(joke.joke);
+    await sendResponse({response: joke.joke, group_id: message.group_id});
 };
 
 const gifTag = async (message) => {
     try {
-        const parsedData = JSON.parse(await request.get(`https://api.giphy.com/v1/gifs/search?q=${message.split('#')[1].trim()}&api_key=dc6zaTOxFJmzC&rating=r&limit=25`));
+        const parsedData = JSON.parse(await request.get(`https://api.giphy.com/v1/gifs/search?q=${message.text.split('#')[1].trim()}&api_key=dc6zaTOxFJmzC&rating=r&limit=25`));
 
-        console.log(`split msg: ${message.split('#')[1].trim()}`);
+        console.log(`split msg: ${message.text.split('#')[1].trim()}`);
         if (parsedData && parsedData.data) {
             if (parsedData.data.length) {
                 const giphyResponse = _.sample(parsedData.data);
                 const botResponse = giphyResponse.images.downsized.url;
-                await sendResponse(botResponse);
+                await sendResponse({response: botResponse, group_id: message.group_id});
             } else {
                 console.log(parsedData);
             }
         } else {
-            console.log(`No gifs for ${message}`);
+            console.log(`No gifs for ${message.text}`);
             await gifTag('#random');
         }
     } catch (e) {
@@ -112,7 +122,8 @@ const arrayToURLParam = (locationArray) => {
     return urlParamString;
 };
 
-const getDirections = async (directionString) => {
+const getDirections = async (message) => {
+    const directionString = message.text;
     const directionStringArray = directionString.split(' ');
     directionStringArray.shift();
     directionStringArray.shift();
@@ -137,10 +148,10 @@ const getDirections = async (directionString) => {
 It will take ${response.routes[0].legs[0].duration.text} to travel ${response.routes[0].legs[0].distance.text}
 
 Click this to start navigation: ${shortUrl}`;
-    await sendResponse(botResponse);
+    await sendResponse({response: botResponse, group_id: message.group_id});
 };
 
-const createMarkovString = async () => {
+const createMarkovString = async (message) => {
     const score = _.random(100);
     const markovOptions = {
         maxLength: 140,
@@ -151,7 +162,7 @@ const createMarkovString = async () => {
     await markov.buildCorpus();
     const result = await markov.generateSentence();
     console.log(`minScore: ${score}`);
-    await sendResponse(result.string);
+    await sendResponse({response: result.string, group_id: message.group_id});
 };
 
 const extractNameFromMessage = (message) => {
@@ -176,7 +187,7 @@ const sendComplimentOrInsult = async (message) => {
     } else {
         response = `${name}${_.sample(insults)}`;
     }
-    await sendResponse(response);
+    await sendResponse({response, group_id: message.group_id});
 };
 
 const respond = () => wrap(async (req, res) => {
@@ -202,39 +213,39 @@ const respond = () => wrap(async (req, res) => {
             console.log("don't care");
             res.send('didn\'t do anything');
         } else if (message.text && yeRegex.test(message.text)) {
-            postMessage();
+            postMessage(message);
             res.send('did the ye thing');
         } else if (message.text && shadesRegex.test(message.text)) {
-            await gifTag('hot garbage');
+            await gifTag({text: 'hot garbage', group_id: message.group_id});
             res.send('50 shades thing');
         } else if (message.text && gifRegex.test(message.text)) {
             console.log('gif requested');
-            await gifTag(message.text);
+            await gifTag(message);
             res.send('sent a gif');
         } else if (message.text && jokeRegex.test(message.text)) {
             console.log('telling a joke');
-            await tellJoke();
+            await tellJoke(message);
             res.send('sent a joke');
         } else if (message.text && jokeRegex2.test(message.text)) {
             console.log('telling a joke');
-            await tellJoke();
+            await tellJoke(message);
             res.send('sent a joke');
         } else if (message.text && eightBallRegex.test(message.text)) {
             console.log('eight ball');
-            await sendEightBallMsg();
+            await sendEightBallMsg(message);
             res.send('sent an 8 ball thing');
         } else if (message.text && leaderRegex.test(message.text)) {
             res.writeHead(200);
             // doLeaderboard();
             res.send('don\'t care');
         } else if (message.text && markovRegex.test(message.text)) {
-            await createMarkovString();
+            await createMarkovString(message);
             res.send('markov');
         } else if (message.text && directionsRegex.test(message.text)) {
-            await getDirections(message.text);
+            await getDirections(message);
             res.send('directions');
         } else if (message.text && (musicRegex.test(message.text) || musicRegex2.test(message.text))) {
-            await sendVideo();
+            await sendVideo(message);
             res.send('video');
         } else if (message.text && (complimentRegex.test(message.text) || complimentRegex2.test(message.text))) {
             await sendComplimentOrInsult(message);
