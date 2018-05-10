@@ -159,7 +159,7 @@ const extractNameFromMessage = (message) => {
     for (let i = 0; i < users.length; i += 1) {
         if (splitMessage.includes(users[i].toLowerCase())) {
             if (users[i] === 'Me') {
-                return `@${message.name}`;
+                return `@${message.name}, `;
             }
             return `@${users[i]}, `;
         }
