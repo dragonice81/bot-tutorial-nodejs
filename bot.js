@@ -211,7 +211,7 @@ const phraseMap = new Map([
     [/@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/, async message => sendComplimentOrInsult(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async () => sendResponse(`${_.random(100)}`)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? find me a restaurant near ([0-9a-zA-Z .,]+)/, async message => findRestaurant(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? restaurant near ([0-9a-zA-Z .,]+)/, , async message => findRestaurant(message)]
+    [/@?[gG]((arrett)|(urt))[bB]ot,? restaurant near ([0-9a-zA-Z .,]+)/, async message => findRestaurant(message)]
 ]);
 
 
