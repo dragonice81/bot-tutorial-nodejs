@@ -15,6 +15,7 @@ const compliments = require('./compliments');
 let saidJokes = [];
 let saidVideos = [];
 
+
 const getBotId = (groupId) => {
     if (+groupId === 21255858) {
         return process.env.BROM_BOT_ID;
@@ -190,79 +191,43 @@ const sendComplimentOrInsult = async (message) => {
     await sendResponse({response, group_id: message.group_id});
 };
 
+const phraseMap = new Map([
+    [/^Ye\?|ye\?$/, async message => postMessage(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? talk to me/, async message => createMarkovString(message)],
+    [/((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/, async message => gifTag({text: 'hot garbage', group_id: message.group_id})],
+    [/#[0-9a-zA-Z ]+/, async message => gifTag(message)],
+    [/[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/, async message => getDirections(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/, async message => tellJoke(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? joke/, async message => tellJoke(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/, async message => sendEightBallMsg(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? give me a song/, async message => sendVideo(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? song/, async message => sendVideo(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? ((compliment)|(insult)) [a-zA-Z]+/, async message => sendComplimentOrInsult(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/, async message => sendComplimentOrInsult(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async () => sendResponse(`${_.random(100)}`)]
+]);
+
+
 const respond = () => wrap(async (req, res) => {
     const message = req.body;
-    const yeRegex = /^Ye\?|ye\?$/;
-    const markovRegex = /@?[gG]((arrett)|(urt))[bB]ot,? talk to me/;
-    const shadesRegex = /((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/;
-    const gifRegex = /#[0-9a-zA-Z ]+/;
-    const leaderRegex = /-leaderboard/;
-    const directionsRegex = /[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/;
-    const jokeRegex = /@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/;
-    const jokeRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? joke/;
-    const eightBallRegex = /@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/;
     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
-    const musicRegex = /@?[gG]((arrett)|(urt))[bB]ot,? give me a song/;
-    const musicRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? song/;
-    const complimentRegex = /@?[gG]((arrett)|(urt))[bB]ot,? ((compliment)|(insult)) [a-zA-Z]+/;
-    const complimentRegex2 = /@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/;
-    const randomNumberRegex = /@?[gG]((arrett)|(urt))[bB]ot,? random number/;
-    console.log(message.text);
-    try {
-        if (message.text && urlRegex.test(message.text)) {
-            console.log("don't care");
-            res.send('didn\'t do anything');
-        } else if (message.text && yeRegex.test(message.text)) {
-            postMessage(message);
-            res.send('did the ye thing');
-        } else if (message.text && shadesRegex.test(message.text)) {
-            await gifTag({text: 'hot garbage', group_id: message.group_id});
-            res.send('50 shades thing');
-        } else if (message.text && gifRegex.test(message.text)) {
-            console.log('gif requested');
-            await gifTag(message);
-            res.send('sent a gif');
-        } else if (message.text && jokeRegex.test(message.text)) {
-            console.log('telling a joke');
-            await tellJoke(message);
-            res.send('sent a joke');
-        } else if (message.text && jokeRegex2.test(message.text)) {
-            console.log('telling a joke');
-            await tellJoke(message);
-            res.send('sent a joke');
-        } else if (message.text && eightBallRegex.test(message.text)) {
-            console.log('eight ball');
-            await sendEightBallMsg(message);
-            res.send('sent an 8 ball thing');
-        } else if (message.text && leaderRegex.test(message.text)) {
-            res.writeHead(200);
-            // doLeaderboard();
-            res.send('don\'t care');
-        } else if (message.text && markovRegex.test(message.text)) {
-            await createMarkovString(message);
-            res.send('markov');
-        } else if (message.text && directionsRegex.test(message.text)) {
-            await getDirections(message);
-            res.send('directions');
-        } else if (message.text && (musicRegex.test(message.text) || musicRegex2.test(message.text))) {
-            await sendVideo(message);
-            res.send('video');
-        } else if (message.text && (complimentRegex.test(message.text) || complimentRegex2.test(message.text))) {
-            await sendComplimentOrInsult(message);
-            res.send('compliment');
-        } else if (message.text && randomNumberRegex.test(message.text)) {
-            await sendResponse(`${_.random(100)}`);
-            res.send('compliment');
-        } else {
-            messages.push(message.text);
-            console.log("don't care");
-            res.send('dont care');
-        }
-    } catch (e) {
-        await sendResponse(e.message, true);
-        res.status(400);
-        res.send(e.message);
+    if (!message.text || (message.text && urlRegex.test(message.text))) {
+        console.log("don't care");
+        res.send('didn\'t do anything');
+        return;
     }
+    phraseMap.forEach(async (func, regEx) => {
+        try {
+            if (regEx.test(message.text)) {
+                await func(message);
+                res.send(message.text);
+            }
+        } catch (e) {
+            await sendResponse(e.message, true);
+            res.status(400);
+            res.send(e.message);
+        }
+    });
 });
 
 module.exports = {
