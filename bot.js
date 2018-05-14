@@ -191,6 +191,11 @@ const sendComplimentOrInsult = async (message) => {
     await sendResponse({response, group_id: message.group_id});
 };
 
+// TODO:
+const findRestaurant = async (message) => {
+    console.log(message);
+};
+
 const phraseMap = new Map([
     [/^Ye\?|ye\?$/, async message => postMessage(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? talk to me/, async message => createMarkovString(message)],
@@ -204,7 +209,9 @@ const phraseMap = new Map([
     [/@?[gG]((arrett)|(urt))[bB]ot,? song/, async message => sendVideo(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? ((compliment)|(insult)) [a-zA-Z]+/, async message => sendComplimentOrInsult(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/, async message => sendComplimentOrInsult(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async () => sendResponse(`${_.random(100)}`)]
+    [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async () => sendResponse(`${_.random(100)}`)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? find me a restaurant near ([0-9a-zA-Z .,]+)/, async message => findRestaurant(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? restaurant near ([0-9a-zA-Z .,]+)/, , async message => findRestaurant(message)]
 ]);
 
 
