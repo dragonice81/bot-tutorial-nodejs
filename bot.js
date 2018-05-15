@@ -268,6 +268,7 @@ const respond = () => wrap(async (req, res) => {
             if (regEx.test(message.text)) {
                 await func(message);
                 res.send(message.text);
+                return;
             }
         } catch (e) {
             await sendResponse(e.message, true);
