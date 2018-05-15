@@ -221,7 +221,7 @@ const findRestaurant = async (message) => {
     } catch (e) {
         throw new Error(`Restaurant Error ${e}`);
     }
-    if (!response.results || response.results.length === 0 || response.statusCode !== 200) {
+    if (!response.results || response.results.length === 0) {
         await sendResponse({response: 'No results found 😞', group_id: message.group_id});
     }
     const results = _.slice(_.orderBy(response.results, ['rating'], ['desc']), 0, 10);
