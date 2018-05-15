@@ -258,7 +258,7 @@ const phraseMap = new Map([
 const respond = () => wrap(async (req, res) => {
     const message = req.body;
     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)/;
-    if (!message.text || (message.text && urlRegex.test(message.text))) {
+    if (!message.text || message.name.toLowerCase() === 'garrettbot' || (message.text && urlRegex.test(message.text))) {
         console.log("don't care");
         res.send('didn\'t do anything');
         return;
