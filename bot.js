@@ -221,6 +221,7 @@ const findRestaurant = async (message) => {
     } catch (e) {
         throw new Error(`Restaurant Error ${e}`);
     }
+    console.log(response);
     if (!response.results || response.results.length === 0) {
         await sendResponse({response: 'No results found 😞', group_id: message.group_id});
     }
@@ -250,8 +251,8 @@ const phraseMap = new Map([
     [/@?[gG]((arrett)|(urt))[bB]ot,? ((compliment)|(insult)) [a-zA-Z]+/, async message => sendComplimentOrInsult(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/, async message => sendComplimentOrInsult(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async () => sendResponse(`${_.random(100)}`)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+)/, async message => findRestaurant(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+)/, async message => findRestaurant(message)]
+    [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
+        async message => findRestaurant(message)]
 ]);
 
 
