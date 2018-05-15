@@ -29,9 +29,11 @@ const sendResponse = async (botResponse, error) => {
     const messageBotId = getBotId(botResponse.group_id);
     const botID = error || !messageBotId ? process.env.BOT_ID_TEST : messageBotId;
     console.log(`sending ${botResponse.response} to ${botID}`);
+    const attachments = botResponse.attachments || [];
     const body = {
         bot_id: botID,
-        text: botResponse.response
+        text: botResponse.response,
+        attachments
     };
     await setTimeout(() => { console.log('waiting'); }, 50);
     await request.post('https://api.groupme.com/v3/bots/post/', {body: JSON.stringify(body)});
@@ -193,7 +195,45 @@ const sendComplimentOrInsult = async (message) => {
 
 // TODO:
 const findRestaurant = async (message) => {
-    console.log(message);
+    const messageArray = message.text.split(' ');
+    let restaurantType = '';
+    let location = '';
+    let locationIndex = 0;
+    const ignoreStrings = ['find', 'me', 'a', 'restaurant'];
+    for (let i = 1; i < messageArray.length; i += 1) {
+        if (messageArray[i] === 'restaurant') {
+            locationIndex = i + 2;
+            break;
+        }
+        if (!ignoreStrings.includes(messageArray[i])) {
+            restaurantType += `${messageArray[i]} `;
+        }
+    }
+    while (locationIndex < messageArray.length) {
+        location += `${messageArray[locationIndex]} `;
+        locationIndex += 1;
+    }
+    const queryString = encodeURI((`${restaurantType}restaurants in ${location}`).trim());
+    const googleUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${queryString}&key=${process.env.MAP_KEY}`;
+    let response;
+    try {
+        response = JSON.parse(await request.get(googleUrl));
+    } catch (e) {
+        throw new Error(`Restaurant Error ${e}`);
+    }
+    if (!response.results || response.results.length === 0 || response.statusCode !== 200) {
+        await sendResponse({response: 'No results found 😞', group_id: message.group_id});
+    }
+    const results = _.slice(_.orderBy(response.results, ['rating'], ['desc']), 0, 10);
+    const selectedResult = _.sample(results);
+    const restaurantName = selectedResult.name;
+    const restaurantLocation = selectedResult.geometry.location;
+    const restaurantAddress = selectedResult.formatted_address;
+    await sendResponse({
+        response: restaurantAddress,
+        group_id: message.group_id,
+        attachments: [{type: 'location', name: restaurantName, lat: restaurantLocation.lat, lng: restaurantLocation.lng}]
+    });
 };
 
 const phraseMap = new Map([
@@ -210,8 +250,8 @@ const phraseMap = new Map([
     [/@?[gG]((arrett)|(urt))[bB]ot,? ((compliment)|(insult)) [a-zA-Z]+/, async message => sendComplimentOrInsult(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/, async message => sendComplimentOrInsult(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async () => sendResponse(`${_.random(100)}`)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? find me a restaurant near ([0-9a-zA-Z .,]+)/, async message => findRestaurant(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? restaurant near ([0-9a-zA-Z .,]+)/, async message => findRestaurant(message)]
+    [/@?[gG]((arrett)|(urt))[bB]ot,? find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+)/, async message => findRestaurant(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+)/, async message => findRestaurant(message)]
 ]);
 
 
@@ -239,5 +279,6 @@ const respond = () => wrap(async (req, res) => {
 
 module.exports = {
     respond,
-    sendResponse
+    sendResponse,
+    findRestaurant
 };
