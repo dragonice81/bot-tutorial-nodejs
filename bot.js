@@ -221,7 +221,6 @@ const findRestaurant = async (message) => {
     } catch (e) {
         throw new Error(`Restaurant Error ${e}`);
     }
-    console.log(response);
     if (!response.results || response.results.length === 0) {
         await sendResponse({response: 'No results found 😞', group_id: message.group_id});
     }
