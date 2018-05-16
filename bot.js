@@ -21,6 +21,8 @@ const getBotId = (groupId) => {
         return process.env.BROM_BOT_ID;
     } else if (+groupId === 39437389) {
         return process.env.AMERICA_BOT_ID;
+    } else if (+groupId === 40632517) {
+        return process.env.WORK_BOT_ID;
     }
     return undefined;
 };
