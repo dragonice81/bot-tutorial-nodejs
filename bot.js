@@ -105,7 +105,8 @@ const gifTag = async (message) => {
                 const botResponse = giphyResponse.images.downsized.url;
                 await sendResponse({response: botResponse, group_id: message.group_id});
             } else {
-                console.log(parsedData);
+                console.log(`No gifs for ${message.text}`);
+                await gifTag('#random');
             }
         } else {
             console.log(`No gifs for ${message.text}`);
