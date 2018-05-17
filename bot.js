@@ -106,11 +106,11 @@ const gifTag = async (message) => {
                 await sendResponse({response: botResponse, group_id: message.group_id});
             } else {
                 console.log(`No gifs for ${message.text}`);
-                await gifTag('#random');
+                await gifTag({text: '#random', group_id: message.group_id});
             }
         } else {
             console.log(`No gifs for ${message.text}`);
-            await gifTag('#random');
+            await gifTag({text: '#random', group_id: message.group_id});
         }
     } catch (e) {
         console.log(`gifTag error: ${e}`);
