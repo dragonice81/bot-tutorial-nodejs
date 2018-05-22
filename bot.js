@@ -195,7 +195,7 @@ const extractNameFromMessage = (message) => {
         return '';
     }
     name = name.trim();
-    return `@${name}`;
+    return `@${name} `;
 };
 
 const sendComplimentOrInsult = async (message) => {
