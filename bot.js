@@ -181,7 +181,21 @@ const extractNameFromMessage = (message) => {
             return `@${users[i]}, `;
         }
     }
-    return '';
+    let nameFlag = false;
+    let name = '';
+    for (let i = 0; i < splitMessage.length; i += 1) {
+        if (nameFlag) {
+            name += `${splitMessage[i]} `;
+        }
+        if (splitMessage[i] === 'compliment') {
+            nameFlag = true;
+        }
+    }
+    if (!name) {
+        return '';
+    }
+    name = name.trim();
+    return `@${name}`;
 };
 
 const sendComplimentOrInsult = async (message) => {
