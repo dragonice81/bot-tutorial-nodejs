@@ -11,6 +11,10 @@ let jokes = require('./jokes');
 const users = require('./users');
 const insults = require('./insults');
 const compliments = require('./compliments');
+const weather = require('weather-js');
+const {promisify} = require('util');
+
+const fetchWeather = promisify(weather.find);
 
 let saidJokes = [];
 let saidVideos = [];
@@ -187,7 +191,7 @@ const extractNameFromMessage = (message) => {
         if (nameFlag) {
             name += `${splitMessage[i]} `;
         }
-        if (splitMessage[i] === 'compliment') {
+        if (splitMessage[i] === 'compliment' || splitMessage[i] === 'insult') {
             nameFlag = true;
         }
     }
@@ -210,7 +214,6 @@ const sendComplimentOrInsult = async (message) => {
     await sendResponse({response, group_id: message.group_id});
 };
 
-// TODO:
 const findRestaurant = async (message) => {
     const messageArray = message.text.split(' ');
     let restaurantType = '';
@@ -253,6 +256,31 @@ const findRestaurant = async (message) => {
     });
 };
 
+const getWeather = async (message) => {
+    const splitMessage = message.text.split(' ');
+    let location = '';
+    for (let i = 3; i < splitMessage.length; i += 1) {
+        location += `${splitMessage[i]} `;
+    }
+    location = location.trim();
+    const weatherResults = await fetchWeather({search: location, degreeType: 'F'});
+    if (!weatherResults.length) {
+        await sendResponse({response: 'ye? 🤔', group_id: message.group_id});
+    }
+    const relevantWeather = weatherResults[0];
+    const currentDay = relevantWeather.current.shortday;
+    let todayForecast;
+    relevantWeather.forecast.forEach((forecast) => {
+        if (forecast.shortday === currentDay) {
+            todayForecast = forecast;
+        }
+    });
+    const precipString = +todayForecast.high > 35 ? 'rain' : 'snow';
+    const returnString = `It is currently ${relevantWeather.current.skytext} and ${relevantWeather.current.temperature} outside in ${relevantWeather.location.name}.
+The High today is ${todayForecast.high} and the Low is ${todayForecast.low} with a ${todayForecast.precip}% chance of ${precipString}`;
+    await sendResponse({response: returnString, group_id: message.group_id});
+};
+
 const phraseMap = new Map([
     [/^Ye\?|ye\?$/, async message => postMessage(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? talk to me/, async message => createMarkovString(message)],
@@ -266,7 +294,8 @@ const phraseMap = new Map([
     [/@?[gG]((arrett)|(urt))[bB]ot,? song/, async message => sendVideo(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? ((compliment)|(insult)) [a-zA-Z]+/, async message => sendComplimentOrInsult(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/, async message => sendComplimentOrInsult(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async () => sendResponse(`${_.random(100)}`)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async message => sendResponse({response: `${_.random(100)}`, group_id: message.group_id})],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? weather in ([0-9a-zA-Z .,]+)/, async message => getWeather(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
         async message => findRestaurant(message)]
 ]);
@@ -288,7 +317,7 @@ const respond = () => wrap(async (req, res) => {
                 return;
             }
         } catch (e) {
-            await sendResponse(e.message, true);
+            await sendResponse({response: e.message}, true);
             res.status(400);
             res.send(e.message);
         }
