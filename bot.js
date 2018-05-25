@@ -277,7 +277,7 @@ const getWeather = async (message) => {
     });
     const precipString = +todayForecast.high > 35 ? 'rain' : 'snow';
     const returnString = `It is currently ${relevantWeather.current.skytext} and ${relevantWeather.current.temperature} outside in ${relevantWeather.location.name}.
-The High today is ${todayForecast.high} and the Low is ${todayForecast.low} with a ${todayForecast.precip}% chance of ${precipString}`;
+The High today is ${todayForecast.high} and the Low is ${todayForecast.low} with a ${todayForecast.precip} percent chance of ${precipString}`;
     await sendResponse({response: returnString, group_id: message.group_id});
 };
 
