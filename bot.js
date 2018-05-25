@@ -266,6 +266,7 @@ const getWeather = async (message) => {
     const weatherResults = await fetchWeather({search: location, degreeType: 'F'});
     if (!weatherResults.length) {
         await sendResponse({response: 'ye? 🤔', group_id: message.group_id});
+        return;
     }
     const relevantWeather = weatherResults[0];
     const currentDay = relevantWeather.current.shortday;
