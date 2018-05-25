@@ -19,6 +19,10 @@ app.use(bodyParser.json({limit: '512mb'}));
 // routes
 app.post('/', bot.respond());
 
+app.get('/health', (req, res) => {
+    res.send('Ok');
+});
+
 schedule.scheduleJob(cronString4202, async () => {
     await bot.sendResponse('https://youtu.be/wWSAI9d3Vxk?t=38');
 });

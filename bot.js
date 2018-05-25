@@ -13,8 +13,11 @@ const insults = require('./insults');
 const compliments = require('./compliments');
 const weather = require('weather-js');
 const {promisify} = require('util');
+// const fs = require('fs');
+// const textMeme = require('text-meme');
 
 const fetchWeather = promisify(weather.find);
+// const readFileAsync = promisify(fs.readFileSync);
 
 let saidJokes = [];
 let saidVideos = [];
@@ -282,6 +285,22 @@ The High today is ${todayForecast.high} and the Low is ${todayForecast.low} with
     await sendResponse({response: returnString, group_id: message.group_id});
 };
 
+// const makeTextMeme = (message) => {
+//     textMeme('somebody once told me the world was gonna roll me', {delay: 600, filename: 'quote.gif', background: '#4f656d'}).then(async (filename) => {
+//         console.log('meme created');
+//         const image = await readFileAsync(`./${filename}`);
+//         console.log(image);
+//         const imageUrl = await request.post('https://image.groupme.com', {
+//             headers: {
+//                 'access-token': 'Gf0kXOg4rMRt0aEEnrqSmKETTaNJsDOAmSomRyvm'
+//             },
+//             body: image
+//         });
+//         console.log(imageUrl);
+//         await sendResponse({response: '', group_id: '678c500d5d216e077e520322bc', attachments: [{type: 'image', url: imageUrl}]});    
+//     });
+// };
+
 const phraseMap = new Map([
     [/^Ye\?|ye\?$/, async message => postMessage(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? talk to me/, async message => createMarkovString(message)],
@@ -297,6 +316,7 @@ const phraseMap = new Map([
     [/@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/, async message => sendComplimentOrInsult(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async message => sendResponse({response: `${_.random(100)}`, group_id: message.group_id})],
     [/@?[gG]((arrett)|(urt))[bB]ot,? weather in ([0-9a-zA-Z .,]+)/, async message => getWeather(message)],
+    // [/meme/, async message => makeTextMeme(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
         async message => findRestaurant(message)]
 ]);
