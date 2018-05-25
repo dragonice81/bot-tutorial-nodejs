@@ -1,19 +1,20 @@
 FROM node:9.11.1-slim
 
-WORKDIR /app
+WORKDIR /garrettbot
 
-COPY . /app
+COPY . /garrettbot
 
-RUN apt-get update
+RUN apt-get update && apt-get install -y \
+    libcairo2-dev \
+    libjpeg-dev \
+    libpango1.0-dev \
+    libgif-dev \
+    build-essential \
+    g++
 
-RUN apt-get install -y libcairo2-dev
-RUN apt-get install -y libjpeg-dev
-RUN apt-get install -y libpango1.0-dev
-RUN apt-get install -y libgif-dev
-RUN apt-get install -y build-essential
-RUN apt-get install -y g++
+RUN rm -rf node_modules/
 
-RUN npm install
+RUN npm install --quiet --unsafe-perm
 
 EXPOSE 5000
 

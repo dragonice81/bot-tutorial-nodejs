@@ -1,0 +1,17 @@
+version: '3.4'
+services:
+  garrettbot:
+    build: .
+    volumes:
+          - ".:/garrettbot"
+          - "/garrettbot/node_modules"
+    ports:
+         - "5000:5000"
+         - "9228:9228"
+         - "9227:9227"
+    expose:
+     - "9228"
+     - "9227"
+    entrypoint: ["npm", "run", "start:dev"]
+    env_file:
+      - .env
