@@ -1,0 +1,1 @@
+heroku container:push web --app garrettbot-docker;

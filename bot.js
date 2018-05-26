@@ -13,11 +13,10 @@ const insults = require('./insults');
 const compliments = require('./compliments');
 const weather = require('weather-js');
 const {promisify} = require('util');
-const fs = require('fs');
 const textMeme = require('text-meme');
+const readFile = require('fs-readfile-promise');
 
 const fetchWeather = promisify(weather.find);
-const readFileAsync = promisify(fs.readFile);
 
 let saidJokes = [];
 let saidVideos = [];
@@ -35,9 +34,8 @@ const getBotId = (groupId) => {
 };
 
 const sendResponse = async (botResponse, error) => {
-    // const messageBotId = getBotId(botResponse.group_id);
-    // const botID = error || !messageBotId ? process.env.BOT_ID_TEST : messageBotId;
-    const botID = '678c500d5d216e077e520322bc';
+    const messageBotId = getBotId(botResponse.group_id);
+    const botID = error || !messageBotId ? process.env.BOT_ID_TEST : messageBotId;
     console.log(`sending ${botResponse.response} to ${botID}`);
     const attachments = botResponse.attachments || [];
     const body = {
@@ -45,7 +43,6 @@ const sendResponse = async (botResponse, error) => {
         text: botResponse.response,
         attachments
     };
-    console.log(body.attachments);
     await setTimeout(() => { console.log('waiting'); }, 50);
     await request.post('https://api.groupme.com/v3/bots/post/', {body: JSON.stringify(body)});
 };
@@ -287,18 +284,26 @@ The High today is ${todayForecast.high} and the Low is ${todayForecast.low} with
     await sendResponse({response: returnString, group_id: message.group_id});
 };
 
-const makeTextMeme = async (message) => {
-    const filename = await textMeme('somebody once told me the world was gonna roll me', {delay: 600, filename: 'quote.gif', background: '#4f656d'});
-    console.log(`meme created: ${filename}`);
-    const image = await readFileAsync(`${filename}`);
-    await setTimeout(() => { console.log('waiting text meme'); }, 2000);
-    const imageServiceResponse = await request.post('https://image.groupme.com/pictures', {
-        headers: {
-            'x-access-token': 'Gf0kXOg4rMRt0aEEnrqSmKETTaNJsDOAmSomRyvm'
-        },
-        body: image
+const makeTextMeme = (message) => {
+    const splitMessage = message.text.split(' ');
+    let gifWords = '';
+    for (let i = 2; i < splitMessage.length; i += 1) {
+        gifWords += `${splitMessage[i]} `;
+    }
+    textMeme(gifWords, {delay: 350, filename: 'quote.gif', background: '#4f656d'}).then(async (filename) => {
+        await setTimeout(async () => {
+            const image = await readFile(`${filename}`);
+            const response = await request.post('https://image.groupme.com/pictures', {
+                headers: {
+                    'x-access-token': 'Gf0kXOg4rMRt0aEEnrqSmKETTaNJsDOAmSomRyvm',
+                    'content-type': 'image/gif'
+                },
+                body: image
+            });
+            const imageService = JSON.parse(response);
+            await sendResponse({response: ' ', group_id: message.group_id, attachments: [{type: 'image', url: imageService.payload.url}]});
+        }, 500);
     });
-    await sendResponse({response: 'yo', group_id: '678c500d5d216e077e520322bc', attachments: [{type: 'image', url: imageServiceResponse.url}]});
 };
 
 const phraseMap = new Map([
@@ -316,7 +321,7 @@ const phraseMap = new Map([
     [/@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/, async message => sendComplimentOrInsult(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async message => sendResponse({response: `${_.random(100)}`, group_id: message.group_id})],
     [/@?[gG]((arrett)|(urt))[bB]ot,? weather in ([0-9a-zA-Z .,]+)/, async message => getWeather(message)],
-    [/meme/, async message => makeTextMeme(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? gif ([0-9a-zA-Z .,]+)/, async message => makeTextMeme(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
         async message => findRestaurant(message)]
 ]);

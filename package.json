@@ -21,7 +21,8 @@
     "request-promise-native": "1.0.5",
     "shorturl": "0.0.3",
     "weather-js": "2.0.0",
-    "text-meme": "2.3.0"
+    "text-meme": "2.3.0",
+    "fs-readfile-promise":"3.0.1"
   },
   "devDependencies": {
     "eslint": "3.17.1",
