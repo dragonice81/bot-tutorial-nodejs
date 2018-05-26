@@ -1,4 +1,8 @@
-[  
+[
+    {
+        "joke": "Yesterday I froze myself to -273.15°C. It was 0K",
+        "said": false
+    },  
     {  
        "joke":"Did you hear about the restaurant on the moon? Great food, no atmosphere.",
        "said":false
