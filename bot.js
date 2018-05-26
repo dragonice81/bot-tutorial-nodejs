@@ -15,6 +15,7 @@ const weather = require('weather-js');
 const {promisify} = require('util');
 const textMeme = require('text-meme');
 const readFile = require('fs-readfile-promise');
+const colorHelper = require('color-to-name');
 
 const fetchWeather = promisify(weather.find);
 
@@ -284,13 +285,30 @@ The High today is ${todayForecast.high} and the Low is ${todayForecast.low} with
     await sendResponse({response: returnString, group_id: message.group_id});
 };
 
-const makeTextMeme = (message) => {
+const getColorCode = (colorName) => {
+    const colors = colorHelper.getAllColors();
+    let color;
+    Object.keys(colors).forEach((hexCode) => {
+        if (colors[hexCode] === colorName.toLowerCase()) {
+            color = hexCode;
+        }
+    });
+    return color || '#4f656d';
+};
+
+const makeTextMeme = (message, customColorFlag) => {
+    let color = '#4f656d';
     const splitMessage = message.text.split(' ');
     let gifWords = '';
-    for (let i = 2; i < splitMessage.length; i += 1) {
+    let indexStart = 2;
+    if (customColorFlag) {
+        indexStart = 3;
+        color = getColorCode(splitMessage[2].replace('-', ''));
+    }
+    for (let i = indexStart; i < splitMessage.length; i += 1) {
         gifWords += `${splitMessage[i]} `;
     }
-    textMeme(gifWords, {delay: 350, filename: 'quote.gif', background: '#4f656d'}).then(async (filename) => {
+    textMeme(gifWords, {delay: 350, filename: 'quote.gif', background: color}).then(async (filename) => {
         await setTimeout(async () => {
             const image = await readFile(`${filename}`);
             const response = await request.post('https://image.groupme.com/pictures', {
@@ -322,6 +340,7 @@ const phraseMap = new Map([
     [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async message => sendResponse({response: `${_.random(100)}`, group_id: message.group_id})],
     [/@?[gG]((arrett)|(urt))[bB]ot,? weather in ([0-9a-zA-Z .,]+)/, async message => getWeather(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? gif ([0-9a-zA-Z .,]+)/, async message => makeTextMeme(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? gif -[a-zA-Z]+ ([0-9a-zA-Z .,]+)/, async message => makeTextMeme(message, true)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
         async message => findRestaurant(message)]
 ]);

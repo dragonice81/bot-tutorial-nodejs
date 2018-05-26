@@ -22,7 +22,8 @@
     "shorturl": "0.0.3",
     "weather-js": "2.0.0",
     "text-meme": "2.3.0",
-    "fs-readfile-promise":"3.0.1"
+    "fs-readfile-promise": "3.0.1",
+    "color-to-name": "1.0.15"
   },
   "devDependencies": {
     "eslint": "3.17.1",
