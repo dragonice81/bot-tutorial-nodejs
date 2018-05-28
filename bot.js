@@ -101,7 +101,31 @@ const tellJoke = async (message) => {
     await sendResponse({response: joke.joke, group_id: message.group_id});
 };
 
+const sendToGroupmeImageService = async (filePath) => {
+    const image = await readFile(`${filePath}`);
+    const response = await request.post('https://image.groupme.com/pictures', {
+        headers: {
+            'x-access-token': process.env.GM_ACCESS_TOKEN,
+            'content-type': 'image/gif'
+        },
+        body: image
+    });
+    return response;
+};
+
+const sendPictureOfDarby = async (message) => {
+    const imageNumber = _.random(1, 6);
+    const filePath = `./images/${imageNumber}.png`;
+    const response = await sendToGroupmeImageService(filePath);
+    const imageService = JSON.parse(response);
+    await sendResponse({response: ' ', group_id: message.group_id, attachments: [{type: 'image', url: imageService.payload.url}]});
+};
+
 const gifTag = async (message) => {
+    if (message.text === '#bae') {
+        await sendPictureOfDarby(message);
+        return;
+    }
     try {
         const parsedData = JSON.parse(await request.get(`https://api.giphy.com/v1/gifs/search?q=${message.text.split('#')[1].trim()}&api_key=dc6zaTOxFJmzC&rating=r&limit=25`));
 
@@ -310,14 +334,7 @@ const makeTextMeme = (message, customColorFlag) => {
     }
     textMeme(gifWords, {delay: 350, filename: 'quote.gif', background: color}).then(async (filename) => {
         await setTimeout(async () => {
-            const image = await readFile(`${filename}`);
-            const response = await request.post('https://image.groupme.com/pictures', {
-                headers: {
-                    'x-access-token': 'Gf0kXOg4rMRt0aEEnrqSmKETTaNJsDOAmSomRyvm',
-                    'content-type': 'image/gif'
-                },
-                body: image
-            });
+            const response = await sendToGroupmeImageService(filename);
             const imageService = JSON.parse(response);
             await sendResponse({response: ' ', group_id: message.group_id, attachments: [{type: 'image', url: imageService.payload.url}]});
         }, 500);
