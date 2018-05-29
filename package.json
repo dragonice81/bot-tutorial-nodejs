@@ -23,7 +23,8 @@
     "weather-js": "2.0.0",
     "text-meme": "2.3.0",
     "fs-readfile-promise": "3.0.1",
-    "color-to-name": "1.0.15"
+    "color-to-name": "1.0.15",
+    "express-async-errors": "2.1.2"
   },
   "devDependencies": {
     "eslint": "3.17.1",

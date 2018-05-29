@@ -1,4 +1,3 @@
-const wrap = require('../middleware/error-catcher');
 const markovController = require('../bot_actions/markov');
 const sendGif = require('../bot_actions/gif');
 const directions = require('../bot_actions/directions');
@@ -36,7 +35,7 @@ const phraseMap = new Map([
 ]);
 
 
-const respond = () => wrap(async (req, res) => {
+const respond = () => async (req, res) => {
     const message = req.body;
     const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/;
     if (!message.text || message.name.toLowerCase() === 'garrettbot' || (message.text && urlRegex.test(message.text))) {
@@ -58,7 +57,7 @@ const respond = () => wrap(async (req, res) => {
             res.send(e.message);
         }
     });
-});
+};
 
 module.exports = {
     respond
