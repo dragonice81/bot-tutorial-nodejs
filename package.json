@@ -9,6 +9,9 @@
     "eslint": "eslint '**/*.js' --fix",
     "test:integration": "mocha test/integration"
   },
+  "pre-commit": [
+    "eslint"
+  ],
   "dependencies": {
     "body-parser": "1.18.2",
     "cool-ascii-faces": "1.3.x",
@@ -35,7 +38,8 @@
     "nodemon": "1.12.1",
     "chai": "4.1.2",
     "chai-http": "4.0.0",
-    "rewire": "4.0.1"
+    "rewire": "4.0.1",
+    "pre-commit": "1.2.2"
   },
   "engines": {
     "node": "10.2.1"
