@@ -1,7 +1,7 @@
 {
-  "name": "node-js-getting-started",
-  "version": "1.5.1",
-  "description": "A sample Node.js app using Express 4",
+  "name": "GarrettBot",
+  "version": "2.0.1",
+  "description": "A Groupme chatbot",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -32,11 +32,11 @@
     "nodemon": "1.12.1"
   },
   "engines": {
-    "node": "9.2.x"
+    "node": "10.2.1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/heroku/node-js-getting-started"
+    "url": "https://github.com/dragonice81/garrett-bot"
   },
   "keywords": [
     "node",
