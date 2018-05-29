@@ -1,5 +1,5 @@
 const markovController = require('../bot_actions/markov');
-const sendGif = require('../bot_actions/gif');
+const gif = require('../bot_actions/gif');
 const directions = require('../bot_actions/directions');
 const tellJoke = require('../bot_actions/joke');
 const sendEightBallMsg = require('../bot_actions/eight_ball');
@@ -16,8 +16,8 @@ const _ = require('lodash');
 const phraseMap = new Map([
     [/^Ye\?|ye\?$/, async message => yeOrNerr(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? talk to me/, async message => markovController.createMarkovString(message)],
-    [/((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/, async message => sendGif({text: 'hot garbage', group_id: message.group_id})],
-    [/#[0-9a-zA-Z ]+/, async message => sendGif(message)],
+    [/((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/, async message => gif.sendGif({text: 'hot garbage', group_id: message.group_id})],
+    [/#[0-9a-zA-Z ]+/, async message => gif.sendGif(message)],
     [/[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/, async message => directions(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/, async message => tellJoke(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? joke/, async message => tellJoke(message)],

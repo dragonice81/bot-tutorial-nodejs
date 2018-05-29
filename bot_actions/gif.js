@@ -39,4 +39,4 @@ const sendGif = async (message) => {
     }
 };
 
-module.exports = sendGif;
+module.exports = {sendGif};
