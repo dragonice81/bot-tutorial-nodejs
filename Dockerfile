@@ -1,4 +1,4 @@
-FROM node:9.11.1-slim
+FROM node:10.2.1-slim
 
 WORKDIR /garrettbot
 
