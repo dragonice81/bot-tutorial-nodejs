@@ -1,13 +1,14 @@
 let jokes = require('../jokes.json');
 const _ = require('lodash');
 const sendMessage = require('./send_message');
+const logger = require('winston');
 
 let saidJokes = [];
 
 
 const tellJoke = async (message) => {
     if (jokes.length === 0) {
-        console.log('no jokes found');
+        logger.info('no jokes found');
         for (let i = 0; i < saidJokes.length; i += 1) {
             saidJokes[i].said = true;
         }

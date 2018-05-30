@@ -13,7 +13,6 @@ const createMarkovString = async (message) => {
     const markov = new Markov(messages, markovOptions);
     await markov.buildCorpus();
     const result = await markov.generateSentence();
-    console.log(`minScore: ${score}`);
     await sendMessage({response: result.string, group_id: message.group_id});
 };
 

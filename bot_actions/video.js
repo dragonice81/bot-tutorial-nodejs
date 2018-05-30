@@ -1,12 +1,13 @@
 let videos = require('../videos.json');
 const _ = require('lodash');
 const sendMessage = require('./send_message');
+const logger = require('winston');
 
 
 let saidVideos = [];
 const sendVideo = async (message) => {
     if (videos.length === 0) {
-        console.log('no songs found');
+        logger.info('no songs found');
         for (let i = 0; i < saidVideos.length; i += 1) {
             saidVideos[i].said = true;
         }

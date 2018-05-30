@@ -3,6 +3,7 @@ require('express-async-errors');
 const getPort = require('get-port');
 const bodyParser = require('body-parser');
 const bot = require('./controllers/bot_router.js');
+const logger = require('winston');
 
 const app = express();
 
@@ -22,9 +23,9 @@ app.get('/health', (req, res) => {
 
 getPort(defaultPort).then((port) => {
     app.listen(port, async () => {
-        console.log(`listening on port ${port}`);
+        logger.info(`listening on port ${port}`);
         if (process.env.NODE_ENV === 'development') {
-            console.log(`Navigate to http://localhost:${port} to use the application`); // eslint-disable-line no-console
+            logger.info(`Navigate to http://localhost:${port} to use the application`);
         }
     });
 });
