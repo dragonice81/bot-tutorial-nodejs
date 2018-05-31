@@ -13,7 +13,6 @@ const yeOrNerr = require('../bot_actions/yeOrNerr');
 const _ = require('lodash');
 const logger = require('winston');
 
-
 const phraseMap = new Map([
     [/^Ye\?|ye\?$/, async message => yeOrNerr(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? talk to me/, async message => markovController.createMarkovString(message)],
