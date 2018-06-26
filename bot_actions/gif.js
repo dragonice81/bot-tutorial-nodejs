@@ -13,7 +13,7 @@ const sendPictureOfDarby = async (message) => {
     }
     const imageNumber = _.sample(notSentDarbyPicIds);
     _.pull(notSentDarbyPicIds, imageNumber);
-    const filePath = `./images/${imageNumber}.png`;
+    const filePath = `./images/darby/${imageNumber}.png`;
     const response = await sendToGroupmeImageService(filePath);
     const imageService = JSON.parse(response);
     await sendMessage({response: ' ', group_id: message.group_id, attachments: [{type: 'image', url: imageService.payload.url}]});
