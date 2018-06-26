@@ -4,8 +4,15 @@ const _ = require('lodash');
 const sendMessage = require('./send_message');
 const logger = require('winston');
 
+const startingDarbyPicIds = [1, 2, 3, 4, 5, 6];
+let notSentDarbyPicIds = [1, 2, 3, 4, 5, 6];
+
 const sendPictureOfDarby = async (message) => {
-    const imageNumber = _.random(1, 6);
+    if (!notSentDarbyPicIds.length) {
+        notSentDarbyPicIds = startingDarbyPicIds;
+    }
+    const imageNumber = _.sample(notSentDarbyPicIds);
+    _.pull(notSentDarbyPicIds, imageNumber);
     const filePath = `./images/${imageNumber}.png`;
     const response = await sendToGroupmeImageService(filePath);
     const imageService = JSON.parse(response);
