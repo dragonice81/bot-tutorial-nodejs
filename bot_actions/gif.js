@@ -20,7 +20,7 @@ const sendPictureOfDarby = async (message) => {
 };
 
 const sendGif = async (message) => {
-    if (message.text === '#bae') {
+    if (message.text.toLowerCase() === '#bae') {
         await sendPictureOfDarby(message);
         return;
     }
