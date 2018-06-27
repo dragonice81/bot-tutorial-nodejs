@@ -1,12 +1,23 @@
+const _ = require('lodash');
+const sendMessage = require('./send_message');
+
+// const badInputs = [
+//     'thank',
+//     'hahaha',
+//     'thanks',
+//     'where'
+// ];
+
 const hasVowel = (inString) => {
-    const vowels = ['a','e','i','o','u']
-	letters = list(inString)
-	return '';
+    const vowels = ['a', 'e', 'i', 'o', 'u'];
+    const letters = inString.split('');
+    const intersect = _.intersection(vowels, letters);
+    return intersect.length !== 0;
 };
-	
+
 const letterTrios = (inString) => {
-	let trios = []
-    let letters = inString.split('');
+    const trios = [];
+    const letters = inString.split('');
     for (let i = 0; i < letters.length; i += 1) {
         const letterPos = i;
         const letter = letters[letterPos];
@@ -24,116 +35,142 @@ const letterTrios = (inString) => {
 
 const makepmByTrios = (stringA, stringB) => {
 	// find all shared trios and their positions in each string
-	aTrios = letterTrios(stringA)
-	bTrios = letterTrios(stringB)
-	if (aTrios.length < 3 || bTrios.length < 3) {
+    let aTrios = letterTrios(stringA);
+    let bTrios = letterTrios(stringB);
+    if (aTrios.length < 3 || bTrios.length < 3) {
         return 'FAIL: word too short for trios';
     }
-	aTrios = aTrios[1:]
-	bTrios = bTrios[:-2]
+    aTrios = aTrios.slice(1);
+    bTrios = bTrios.slice(0, bTrios.length - 2);
 
 	// look for shared trios
-	const hasSharedTrios = false
-	posOfTrios = []
-	for aPos, aTrio in enumerate(aTrios):
-		if hasSharedTrios:
-			break
-		for bPos, bTrio in enumerate(bTrios):
-			if hasSharedTrios:
-				break
-			if aTrio == bTrio:
-				hasSharedTrios = True
-				#print "Found shared trio, '"+aTrio+"' at ("+str(aPos)+","+str(bPos)+")"
-				posOfTrios.append(aPos+1)
-				posOfTrios.append(bPos)
+    let hasSharedTrios = false;
+    const posOfTrios = [];
+    for (let i = 0; i < aTrios.length; i += 1) {
+        const aPos = i;
+        const aTrio = aTrios[i];
+        if (hasSharedTrios) {
+            break;
+        }
+        for (let j = 0; j < bTrios.length; j += 1) {
+            const bPos = j;
+            const bTrio = bTrios[j];
+            if (hasSharedTrios) {
+                break;
+            }
+            if (aTrio === bTrio) {
+                hasSharedTrios = true;
+                posOfTrios.push(aPos + 1);
+                posOfTrios.push(bPos);
+            }
+        }
+    }
+    if (!hasSharedTrios) {
+        return 'FAIL: no shared trios';
+    }
 
-	// check if both strings have shared trios
-	if not hasSharedTrios:
-		return "FAIL: don't have shared trios"
-	
 	// put together and return portmanteau
-	outA = stringA[:posOfTrios[0]] // everything up to and EXcluding the chosen trio in string A
-	outB = stringB[posOfTrios[1]:] // everything after and INcluding the chosen trio in string B
-	return outA+outB
+    const outA = stringA.slice(posOfTrios[0]); // everything up to and EXcluding the chosen trio in string A
+    const outB = stringB.slice(posOfTrios[1], stringB.length); // everything after and INcluding the chosen trio in string B
+    return `${outA}${outB}`;
 };
 
 
-const makepm = (stringA, stringB) => {
-	
+const makepm = async (message) => {
+    const {text} = message;
+    const stringA = text.split(' ')[0];
+    const stringB = text.split(' ')[1];
+    if (stringA.length < 5 || stringB.length < 5) {
+        return '';
+    }
 	// try to make pm by pairs first
-	triopm = makepmByTrios(stringA, stringB)
-	if "FAIL" not in triopm:
-		return triopm
+    const triopm = makepmByTrios(stringA, stringB);
+
+    if (!triopm.includes('FAIL')) {
+        await sendMessage({response: triopm, group_id: message.group_id});
+        return triopm;
+    }
 
 	// check if both strings have at least 1 vowel
-	if not hasVowel(stringA) or not hasVowel(stringB):
-		return "FAIL: don't have vowels in both strings"
-	
+    if (!hasVowel(stringA) || !hasVowel(stringB)) {
+        return "FAIL: don't have vowels in both strings";
+    }
 	// find all vowels and their positions in each string
-	vowels = ['a','e','i','o','u']
-	aVowels = []
-	bVowels = []
-	for aLetter in stringA:
-		if aLetter in vowels:
-			aVowels.append(aLetter)
-		else:
-			aVowels.append("")
-	for bLetter in stringB:
-		if bLetter in vowels:
-			bVowels.append(bLetter)
-		else:
-			bVowels.append("")
+    const vowels = ['a', 'e', 'i', 'o', 'u'];
+    const aVowels = [];
+    const bVowels = [];
+    const aLetters = stringA.split('');
+    const bLetters = stringB.split('');
+    aLetters.forEach((aLetter) => {
+        if (vowels.includes(aLetter)) {
+            aVowels.push(aLetter);
+        } else {
+            aVowels.push('');
+        }
+    });
+    bLetters.forEach((bLetter) => {
+        if (vowels.includes(bLetter)) {
+            bVowels.push(bLetter);
+        } else {
+            bVowels.push('');
+        }
+    });
 
 	// see if A and B have any vowels in common
-	haveCommonVowels = False
-	shouldUseCommonVowels = False
-	vowelPairPositions = []
-	for aVowelPos, aVowel in enumerate(aVowels):
-		for bVowelPos, bVowel in enumerate(bVowels):
-			if aVowel == bVowel and aVowel != "":
-				vowelPairPositions.append([aVowelPos,bVowelPos])
-				haveCommonVowels = True
+    let haveCommonVowels = false;
+    const vowelPairPositions = [];
+
+    for (let i = 0; i < aVowels.length; i += 1) {
+        const aVowelPos = i;
+        const aVowel = aVowels[aVowelPos];
+        for (let j = 0; j < bVowels.length; j += 1) {
+            const bVowelPos = i;
+            const bVowel = bVowels[bVowelPos];
+            if (aVowel && aVowel === bVowel) {
+                vowelPairPositions.push([aVowelPos, bVowelPos]);
+                haveCommonVowels = true;
+            }
+        }
+    }
 
 	// place to record positions of vowels we decide to use
-	posOfVowelsToUse = [-1,-1]
-	
-	// if we have common vowels, choose whether to use them based on position
-	if haveCommonVowels:
-		margin = 2 # guarantees output satisfies len(pm) > 2*margin
-		for vowelPairPosition in vowelPairPositions:
-			if vowelPairPosition[0] < margin or vowelPairPosition[1] >= len(stringB)-margin:
-				continue
-			else:
-				posOfVowelsToUse = vowelPairPosition
-				shouldUseCommonVowels = True
-				break
+    let posOfVowelsToUse = [-1, -1];
 
-	// if not using common vowels, just pick any vowels based on position
-	if not shouldUseCommonVowels:
-		aVowelPos = -1
-		bVowelPos = len(stringB)+1
-		for aVowelIndex, aVowel in enumerate(aVowels):
-			if aVowel != "" and aVowelIndex > aVowelPos:
-				aVowelPos = aVowelIndex
-		for bVowelIndex, bVowel in enumerate(bVowels):
-			if bVowel != "" and bVowelIndex < bVowelPos:
-				bVowelPos = bVowelIndex
-		posOfVowelsToUse[0] = aVowelPos
-		posOfVowelsToUse[1] = bVowelPos
-	
-	// put together and return portmanteau
-	outA = stringA[:posOfVowelsToUse[0]] // everything up to and EXcluding the chosen vowel in string A
-	outB = stringB[posOfVowelsToUse[1]:] // everything after and INcluding the chosen vowel in string B
-	return outA+outB
+	// if we have common vowels, choose whether to use them based on position
+    if (haveCommonVowels) {
+        const margin = 2; // guarantees output satisfies len(pm) > 2*margin
+        vowelPairPositions.forEach((vowelPairPosition) => {
+            if (!(vowelPairPosition[0] < margin || vowelPairPosition[1] >= stringB.length - margin)) {
+                posOfVowelsToUse = vowelPairPosition;
+            }
+        });
+    } else {
+        let aVowelPos = -1;
+        let bVowelPos = stringB.length + 1;
+        for (let i = 0; i < aVowels.length; i += 1) {
+            const aVowelIndex = i;
+            const aVowel = aVowels[aVowelIndex];
+            if (aVowel && aVowelIndex > aVowelPos) {
+                aVowelPos = aVowelIndex;
+            }
+        }
+        for (let i = 0; i < bVowels.length; i += 1) {
+            const bVowelIndex = i;
+            const bVowel = bVowels[bVowelIndex];
+            if (bVowel && bVowelIndex < bVowelPos) {
+                bVowelPos = bVowelIndex;
+            }
+        }
+        posOfVowelsToUse[0] = aVowelPos;
+        posOfVowelsToUse[1] = bVowelPos;
+    }
+
+    const outA = stringA.slice(0, posOfVowelsToUse[0]);
+    const outB = stringB.slice(posOfVowelsToUse[1]);
+    await sendMessage({response: `${outA}${outB}`, group_id: message.group_id});
+    return `${outA}${outB}`;
 };
 
-
-// check inputs
-// inputs = sys.argv
-
-// if len(inputs) != 3:
-// 	print "Need to provide 2 arguments"
-// 	exit()
-
-// outputPM = makepm(inputs[1],inputs[2])
-// print "Output portmanteau is '"+outputPM+"'"
+module.exports = {
+    makepm
+};

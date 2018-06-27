@@ -12,6 +12,7 @@ const findRestaurant = require('../bot_actions/restaurant');
 const yeOrNerr = require('../bot_actions/yeOrNerr');
 const _ = require('lodash');
 const logger = require('winston');
+const portmanteau = require('../bot_actions/portmanteau');
 
 const phraseMap = new Map([
     [/^Ye\?|ye\?$/, async message => yeOrNerr(message)],
@@ -30,6 +31,7 @@ const phraseMap = new Map([
     [/@?[gG]((arrett)|(urt))[bB]ot,? weather in ([0-9a-zA-Z .,]+)/, async message => getWeather(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? gif ([0-9a-zA-Z .,]+)/, async message => makeTextMeme(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? gif -[a-zA-Z]+ ([0-9a-zA-Z .,]+)/, async message => makeTextMeme(message, true)],
+    [/[a-zA-Z]+ [a-zA-Z]+/, async message => portmanteau.makepm(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
         async message => findRestaurant(message)]
 ]);
