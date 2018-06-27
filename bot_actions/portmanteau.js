@@ -78,6 +78,9 @@ const makepmByTrios = (stringA, stringB) => {
 
 const makepm = async (message) => {
     const {text} = message;
+    if (!text || text.split(' ').length !== 2) {
+        return '';
+    }
     const stringA = text.split(' ')[0];
     const stringB = text.split(' ')[1];
     if (stringA.length < 5 || stringB.length < 5) {
