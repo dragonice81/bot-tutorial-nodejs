@@ -87,7 +87,7 @@ const makepm = async (message) => {
     const triopm = makepmByTrios(stringA, stringB);
 
     if (!triopm.includes('FAIL')) {
-        await sendMessage({response: triopm, group_id: message.group_id});
+        await sendMessage({response: `${stringA} + ${stringB} = ${triopm}`, group_id: message.group_id});
         return triopm;
     }
 
@@ -167,7 +167,7 @@ const makepm = async (message) => {
 
     const outA = stringA.slice(0, posOfVowelsToUse[0]);
     const outB = stringB.slice(posOfVowelsToUse[1]);
-    await sendMessage({response: `${outA}${outB}`, group_id: message.group_id});
+    await sendMessage({response: `${stringA} + ${stringB} = ${outA}${outB}`, group_id: message.group_id});
     return `${outA}${outB}`;
 };
 
