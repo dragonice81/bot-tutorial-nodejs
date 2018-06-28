@@ -83,8 +83,12 @@ const makepm = async (message) => {
     }
     const stringA = text.split(' ')[0];
     const stringB = text.split(' ')[1];
-    if (stringA.length < 5 || stringB.length < 5) {
+    if (stringA.length < 3 || stringB.length < 3) {
         return '';
+    }
+    if (stringA.toLowerCase() === 'cedar' && stringB.toLowerCase() === 'rapids') {
+        await sendMessage({response: `${stringA} + ${stringB} = crapids`, group_id: message.group_id});
+        return 'crapids';
     }
 	// try to make pm by pairs first
     const triopm = makepmByTrios(stringA, stringB);
@@ -122,32 +126,32 @@ const makepm = async (message) => {
 	// see if A and B have any vowels in common
     let haveCommonVowels = false;
     const vowelPairPositions = [];
-
     for (let i = 0; i < aVowels.length; i += 1) {
         const aVowelPos = i;
         const aVowel = aVowels[aVowelPos];
         for (let j = 0; j < bVowels.length; j += 1) {
-            const bVowelPos = i;
+            const bVowelPos = j;
             const bVowel = bVowels[bVowelPos];
-            if (aVowel && aVowel === bVowel) {
+            if ((aVowel && bVowel) && aVowel === bVowel) {
                 vowelPairPositions.push([aVowelPos, bVowelPos]);
                 haveCommonVowels = true;
             }
         }
     }
-
+    let shouldUseCommonVowels = false;
 	// place to record positions of vowels we decide to use
     let posOfVowelsToUse = [-1, -1];
-
 	// if we have common vowels, choose whether to use them based on position
     if (haveCommonVowels) {
         const margin = 2; // guarantees output satisfies len(pm) > 2*margin
         vowelPairPositions.forEach((vowelPairPosition) => {
             if (!(vowelPairPosition[0] < margin || vowelPairPosition[1] >= stringB.length - margin)) {
                 posOfVowelsToUse = vowelPairPosition;
+                shouldUseCommonVowels = true;
             }
         });
-    } else {
+    }
+    if (!shouldUseCommonVowels) {
         let aVowelPos = -1;
         let bVowelPos = stringB.length + 1;
         for (let i = 0; i < aVowels.length; i += 1) {
