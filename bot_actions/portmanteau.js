@@ -1,12 +1,14 @@
 const _ = require('lodash');
 const sendMessage = require('./send_message');
 
-// const badInputs = [
-//     'thank',
-//     'hahaha',
-//     'thanks',
-//     'where'
-// ];
+const badInputs = [
+    'thank',
+    'hahaha',
+    'thanks',
+    'where',
+    'thanks',
+    'garrettbot'
+];
 
 const hasVowel = (inString) => {
     const vowels = ['a', 'e', 'i', 'o', 'u'];
@@ -84,6 +86,9 @@ const makepm = async (message) => {
     const stringA = text.split(' ')[0];
     const stringB = text.split(' ')[1];
     if (stringA.length < 3 || stringB.length < 3) {
+        return '';
+    }
+    if (badInputs.includes(stringA) || badInputs.includes(stringB)) {
         return '';
     }
     if (stringA.toLowerCase() === 'cedar' && stringB.toLowerCase() === 'rapids') {

@@ -13,6 +13,7 @@ const yeOrNerr = require('../bot_actions/yeOrNerr');
 const _ = require('lodash');
 const logger = require('winston');
 const portmanteau = require('../bot_actions/portmanteau');
+const nostra = require('nostra');
 
 const phraseMap = new Map([
     [/^Ye\?|ye\?$/, async message => yeOrNerr(message)],
@@ -33,7 +34,8 @@ const phraseMap = new Map([
     [/@?[gG]((arrett)|(urt))[bB]ot,? gif -[a-zA-Z]+ ([0-9a-zA-Z .,]+)/, async message => makeTextMeme(message, true)],
     [/[a-zA-Z]+ [a-zA-Z]+/, async message => portmanteau.makepm(message)],
     [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
-        async message => findRestaurant(message)]
+        async message => findRestaurant(message)],
+    [/@?[gG]((arrett)|(urt))[bB]ot,? fortune/, async message => sendMessage({response: nostra.generate(), group_id: message.group_id})]
 ]);
 
 
@@ -45,20 +47,24 @@ const respond = () => async (req, res) => {
         res.send('didn\'t do anything');
         return;
     }
+    let responseText = '';
+    let status = 200;
     phraseMap.forEach(async (func, regEx) => {
         try {
             if (regEx.test(message.text)) {
                 await func(message);
-                res.send(message.text);
+                responseText = message.text;
                 return;
             }
         } catch (e) {
             logger.error(e.message);
             await sendMessage({response: e.message}, true);
-            res.status(400);
-            res.send(e.message);
+            status = 400;
+            responseText = e.message;
         }
     });
+    res.status(status);
+    res.send(responseText);
 };
 
 module.exports = {
