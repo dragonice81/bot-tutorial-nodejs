@@ -7,7 +7,8 @@
     "start": "node server.js",
     "start:dev": "node_modules/.bin/nodemon --inspect=0.0.0.0:9228 server.js",
     "eslint": "eslint '**/*.js' --fix",
-    "test": "mocha test/integration"
+    "test": "mocha test/integration",
+    "deploy": "heroku container:push web --app garrettbot-docker && heroku container:release web --app garrettbot-docker"
   },
   "pre-commit": [
     "eslint"
