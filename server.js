@@ -18,16 +18,16 @@ app.use(bodyParser.json({limit: '512mb'}));
 app.post('/', bot.respond());
 
 app.get('/health', (req, res) => {
-    res.send('Ok');
+  res.send('Ok');
 });
 
 getPort(defaultPort).then((port) => {
-    app.listen(port, async () => {
-        logger.info(`listening on port ${port}`);
-        if (process.env.NODE_ENV === 'development') {
-            logger.info(`Navigate to http://localhost:${port} to use the application`);
-        }
-    });
+  app.listen(port, async () => {
+    logger.info(`listening on port ${port}`);
+    if (process.env.NODE_ENV === 'development') {
+      logger.info(`Navigate to http://localhost:${port} to use the application`);
+    }
+  });
 });
 
 module.exports = app;

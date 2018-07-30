@@ -1,3 +1,7 @@
+/* eslint no-restricted-syntax: 0 */
+/* eslint no-await-in-loop: 0 */
+
+
 const markovController = require('../bot_actions/markov');
 const sendGif = require('../bot_actions/gif');
 const directions = require('../bot_actions/directions');
@@ -16,57 +20,57 @@ const portmanteau = require('../bot_actions/portmanteau');
 const nostra = require('nostra');
 
 const phraseMap = new Map([
-    [/^Ye\?|ye\?$/, async message => yeOrNerr(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? talk to me/, async message => markovController.createMarkovString(message)],
-    [/((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/, async message => sendGif({text: 'hot garbage', group_id: message.group_id})],
-    [/#[0-9a-zA-Z ]+/, async message => sendGif(message)],
-    [/[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/, async message => directions(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/, async message => tellJoke(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? joke/, async message => tellJoke(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/, async message => sendEightBallMsg(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? give me a song/, async message => sendVideo(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? song/, async message => sendVideo(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? ((compliment)|(insult)) [a-zA-Z]+/, async message => sendComplimentOrInsult(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/, async message => sendComplimentOrInsult(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async message => sendMessage({response: `${_.random(100)}`, group_id: message.group_id})],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? weather in ([0-9a-zA-Z .,]+)/, async message => getWeather(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? gif ([0-9a-zA-Z .,]+)/, async message => makeTextMeme(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? gif -[a-zA-Z]+ ([0-9a-zA-Z .,]+)/, async message => makeTextMeme(message, true)],
-    [/[a-zA-Z]+ [a-zA-Z]+/, async message => portmanteau.makepm(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
-        async message => findRestaurant(message)],
-    [/@?[gG]((arrett)|(urt))[bB]ot,? fortune/, async message => sendMessage({response: nostra.generate(), group_id: message.group_id})]
+  [/^Ye\?|ye\?$/, async message => yeOrNerr(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? talk to me/, async message => markovController.createMarkovString(message)],
+  [/((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/, async message => sendGif({text: 'hot garbage', group_id: message.group_id})],
+  [/#[0-9a-zA-Z ]+/, async message => sendGif(message)],
+  [/[dD]irections from[:]? ([0-9a-zA-Z .,]+) [tT]o[:]? ([0-9a-zA-Z .,]+)/, async message => directions(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? tell me a joke/, async message => tellJoke(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? joke/, async message => tellJoke(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? [a-zA-Z0-9 ]+\?{1}/, async message => sendEightBallMsg(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? give me a song/, async message => sendVideo(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? song/, async message => sendVideo(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? ((compliment)|(insult)) [a-zA-Z]+/, async message => sendComplimentOrInsult(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? ((tell)|(send)) [a-zA-Z]+ an? ((compliment)|(insult))/, async message => sendComplimentOrInsult(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? random number/, async message => sendMessage({response: `${_.random(100)}`, group_id: message.group_id})],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? weather in ([0-9a-zA-Z .,]+)/, async message => getWeather(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? gif ([0-9a-zA-Z .,]+)/, async message => makeTextMeme(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? gif -[a-zA-Z]+ ([0-9a-zA-Z .,]+)/, async message => makeTextMeme(message, true)],
+  [/[a-zA-Z]+ [a-zA-Z]+/, async message => portmanteau.makepm(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
+    async message => findRestaurant(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? fortune/, async message => sendMessage({response: nostra.generate(), group_id: message.group_id})]
 ]);
 
 
 const respond = () => async (req, res) => {
-    const message = req.body;
-    const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/;
-    if (!message.text || message.name.toLowerCase() === 'garrettbot' || (message.text && urlRegex.test(message.text))) {
-        logger.info("don't care");
-        res.send('didn\'t do anything');
-        return;
+  const message = req.body;
+  const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/;
+  if (!message.text || message.name.toLowerCase() === 'garrettbot' || (message.text && urlRegex.test(message.text))) {
+    logger.info("don't care");
+    res.send('didn\'t do anything');
+    return;
+  }
+  let responseText = '';
+  let status = 200;
+  for (const [regEx, func] of phraseMap) {
+    try {
+      if (regEx.test(message.text)) {
+        await func(message);
+        responseText = message.text;
+        break;
+      }
+    } catch (e) {
+      logger.error(e.message);
+      await sendMessage({response: e.message}, true);
+      status = 400;
+      responseText = e.message;
     }
-    let responseText = '';
-    let status = 200;
-    phraseMap.forEach(async (func, regEx) => {
-        try {
-            if (regEx.test(message.text)) {
-                await func(message);
-                responseText = message.text;
-                return;
-            }
-        } catch (e) {
-            logger.error(e.message);
-            await sendMessage({response: e.message}, true);
-            status = 400;
-            responseText = e.message;
-        }
-    });
-    res.status(status);
-    res.send(responseText);
+  }
+  res.status(status);
+  res.send(responseText);
 };
 
 module.exports = {
-    respond
+  respond
 };
