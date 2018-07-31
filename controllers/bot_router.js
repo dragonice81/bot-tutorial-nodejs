@@ -36,10 +36,10 @@ const phraseMap = new Map([
   [/@?[gG]((arrett)|(urt))[bB]ot,? weather in ([0-9a-zA-Z .,]+)/, async message => getWeather(message)],
   [/@?[gG]((arrett)|(urt))[bB]ot,? gif ([0-9a-zA-Z .,]+)/, async message => makeTextMeme(message)],
   [/@?[gG]((arrett)|(urt))[bB]ot,? gif -[a-zA-Z]+ ([0-9a-zA-Z .,]+)/, async message => makeTextMeme(message, true)],
-  [/[a-zA-Z]+ [a-zA-Z]+/, async message => portmanteau.makepm(message)],
   [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
     async message => findRestaurant(message)],
-  [/@?[gG]((arrett)|(urt))[bB]ot,? fortune/, async message => sendMessage({response: nostra.generate(), group_id: message.group_id})]
+  [/@?[gG]((arrett)|(urt))[bB]ot,? fortune/, async message => sendMessage({response: nostra.generate(), group_id: message.group_id})],
+  [/[a-zA-Z]+ [a-zA-Z]+/, async message => portmanteau.makepm(message)]
 ]);
 
 
@@ -47,7 +47,7 @@ const respond = () => async (req, res) => {
   const message = req.body;
   const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/;
   if (!message.text || message.name.toLowerCase() === 'garrettbot' || (message.text && urlRegex.test(message.text))) {
-    logger.info("don't care");
+    logger.info(`Received message that isn't a command: ${message.text ? message.text : ''}`);
     res.send('didn\'t do anything');
     return;
   }
