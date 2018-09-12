@@ -7,7 +7,20 @@ const badInputs = [
   'thanks',
   'where',
   'thanks',
-  'garrettbot'
+  'garrettbot',
+  'for',
+  'one',
+  'only',
+  'haha',
+  'lol',
+  'yes',
+  'please',
+  'really',
+  'nope',
+  'nerr',
+  'you',
+  'her',
+  'she'
 ];
 
 const hasVowel = (inString) => {
@@ -87,6 +100,9 @@ const makepm = async (message) => {
   const stringB = text.split(' ')[1];
   if ((stringA.length < 3 || stringB.length < 3) || (badInputs.includes(stringA.toLowerCase()) || badInputs.includes(stringB.toLowerCase()))) {
     return '';
+  }
+  if (_.random(100) >= 25) {
+    return 'Random number wasn\'t right for portmanteau';
   }
   if (stringA.toLowerCase() === 'cedar' && stringB.toLowerCase() === 'rapids') {
     await sendMessage({response: `${stringA} + ${stringB} = crapids`, group_id: message.group_id});
