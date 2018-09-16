@@ -39,10 +39,11 @@ const getYoutubeVideo = async (message) => {
   if (!results || !results.items || !results.items.length) {
     await sendMessage({response: 'No videos found', group_id: message.group_id});
   }
-  await sendMessage({response: createReplyString(results.items[0]), group_id: message.group_id
+  const videos = results.items.filter(i => i.id.kind === 'youtube#video');
+  await sendMessage({response: createReplyString(videos[0]), group_id: message.group_id
     // , attachments: [{type: 'image', url: results.items[0].snippet.thumbnails.high.url}] TODO: figure out why thumbnails dont show up on ios
   });
-  return createReplyString(results.items[0]);
+  return createReplyString(videos[0]);
 };
 
 module.exports = {
