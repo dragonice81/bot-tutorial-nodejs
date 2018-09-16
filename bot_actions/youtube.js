@@ -23,7 +23,7 @@ const getSearchTerm = (message) => {
 };
 
 const createReplyString = (video) => {
-  if (_.random(100) <= 10) {
+  if (_.random(100) <= 5) {
     return `${youtubeWatchUri}${video.id.videoId}
 ${_.sample(rareResponses)}`;
   }

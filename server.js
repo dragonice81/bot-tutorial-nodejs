@@ -1,5 +1,6 @@
 const express = require('express');
 require('express-async-errors');
+require('dotenv').config();
 const getPort = require('get-port');
 const bodyParser = require('body-parser');
 const bot = require('./controllers/bot_router.js');
