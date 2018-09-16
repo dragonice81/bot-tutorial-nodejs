@@ -18,6 +18,7 @@ const _ = require('lodash');
 const logger = require('winston');
 const portmanteau = require('../bot_actions/portmanteau');
 const nostra = require('nostra');
+const youtube = require('../bot_actions/youtube');
 
 const phraseMap = new Map([
   [/^Ye\?|ye\?$/, async message => yeOrNerr(message)],
@@ -39,6 +40,7 @@ const phraseMap = new Map([
   [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
     async message => findRestaurant(message)],
   [/@?[gG]((arrett)|(urt))[bB]ot,? fortune/, async message => sendMessage({response: nostra.generate(), group_id: message.group_id})],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? play ([0-9a-zA-Z .,]+)/, async message => youtube.getYoutubeVideo(message)],
   [/[a-zA-Z]+ [a-zA-Z]+/, async message => portmanteau.makepm(message)]
 ]);
 
