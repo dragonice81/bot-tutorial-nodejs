@@ -5,8 +5,6 @@ const config = require('config');
 
 const permissions = config.get('SpotifyPermissions');
 
-const SpotifyWebApi = require('../external_services/spotify_client');
-
 const markovController = require('../bot_actions/markov');
 const sendGif = require('../bot_actions/gif');
 const directions = require('../bot_actions/directions');
@@ -25,18 +23,16 @@ const portmanteau = require('../bot_actions/portmanteau');
 const nostra = require('nostra');
 const music = require('../bot_actions/music_helper');
 
-let spotifyApiClient;
-let spotifyExpirationTime;
-
 const changePermissions = async (message, flag) => {
   const userId = message.user_id;
-  if (userId !== process.env.USER_ID) {
+  const requestPermission = permissions.filter(p => p.user_id === userId);
+  if (!requestPermission.admin) {
     return;
   }
   const messageArray = message.text.split(' ');
   let name = '';
   for (let i = 3; i < messageArray.length; i += 1) {
-    name += messageArray[i].toLowerCase();
+    name += `${messageArray[i].toLowerCase()} `;
   }
   name = name.trim();
   for (let j = 0; j < permissions.length; j += 1) {
@@ -50,9 +46,8 @@ const changePermissions = async (message, flag) => {
 
 const changeGlobalPermissions = async (message, flag) => {
   const userId = message.user_id;
-  if (userId !== process.env.USER_ID) {
-    console.log(userId);
-    console.log(process.env.USER_ID);
+  const requestPermission = permissions.filter(p => p.user_id === userId);
+  if (!requestPermission.admin) {
     return;
   }
   permissions[0].IsEnabled = flag;
@@ -84,20 +79,12 @@ const phraseMap = new Map([
   [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
     async message => findRestaurant(message)],
   [/@?[gG]((arrett)|(urt))[bB]ot,? fortune/, async message => sendMessage({response: nostra.generate(), group_id: message.group_id})],
-  [/@?[gG]((arrett)|(urt))[bB]ot,? play ([0-9a-zA-Z .,]+)/, async message => music.fetchMusic(message, spotifyApiClient, permissions)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? play ([0-9a-zA-Z .,]+)/, async message => music.fetchMusic(message, permissions)],
   [/[a-zA-Z]+ [a-zA-Z]+/, async message => portmanteau.makepm(message)]
 ]);
 
 
 const respond = () => async (req, res) => {
-  if (!spotifyApiClient) {
-    const {spotifyApi} = SpotifyWebApi.authorize();
-    spotifyApiClient = spotifyApi;
-    spotifyExpirationTime = await SpotifyWebApi.refreshToken(spotifyApiClient);
-  }
-  if (SpotifyWebApi.checkIfTokenNeedsRefresh(spotifyExpirationTime)) {
-    spotifyExpirationTime = await SpotifyWebApi.refreshToken(spotifyApiClient);
-  }
   const message = req.body;
   const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/;
   if (!message.text || message.name.toLowerCase() === 'garrettbot' || (message.text && urlRegex.test(message.text))) {

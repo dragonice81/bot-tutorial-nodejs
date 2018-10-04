@@ -35,7 +35,7 @@
     "nostra": "0.0.7",
     "parse-reminder": "1.2.0",
     "spotify-web-api-node": "4.0.0",
-    "config":"2.0.1"
+    "config": "2.0.1"
   },
   "devDependencies": {
     "eslint": "3.17.1",

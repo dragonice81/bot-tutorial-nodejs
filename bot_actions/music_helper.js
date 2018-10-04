@@ -1,16 +1,11 @@
 const youtube = require('./youtube');
 const spotify = require('./spotify');
 
-const isSpotifyPlaying = async (spotifyApi) => {
-  const data = await spotifyApi.getMyCurrentPlayingTrack();
-  return data.body.is_playing;
-};
-
-const fetchMusic = async (message, spotifyApi, permissions) => {
-  const permission = permissions.filter(p => p.user_id === message.user_id);
-  const isSpotify = await isSpotifyPlaying(spotifyApi);
+const fetchMusic = async (message, permissions) => {
+  const permission = permissions.filter(p => p.user_id === message.user_id)[0];
+  const isSpotify = await spotify.isSpotifyPlaying();
   if (isSpotify && permission.canSpotify && permissions[0].IsEnabled) {
-    await spotify.getInfo(message, spotifyApi);
+    await spotify.playSong(message);
   } else {
     await youtube.getYoutubeVideo(message);
   }

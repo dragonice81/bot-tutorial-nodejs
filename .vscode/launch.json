@@ -9,7 +9,7 @@
             "port": 9228,
             "address": "localhost",
             "localRoot": "${workspaceRoot}",
-            "remoteRoot": "/usr/src/api"
+            "remoteRoot": "/garrettbot"
         }
     ]
 }

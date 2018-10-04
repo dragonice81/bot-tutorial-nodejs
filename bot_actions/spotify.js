@@ -1,7 +1,37 @@
 const sendMessage = require('./send_message');
 
+const SpotifyClient = require('../external_services/spotify_client');
+
+let spotifyApi;
+let expirationTime;
+
+const initApi = async () => {
+  spotifyApi = SpotifyClient.authorize();
+  const refreshedClient = await SpotifyClient.refreshToken(spotifyApi);
+  spotifyApi = refreshedClient.spotifyApi;
+  expirationTime = refreshedClient.expirationTime;
+};
+
+const checkSpotifyApi = async () => {
+  if (!spotifyApi) {
+    await initApi();
+  }
+  if (SpotifyClient.checkIfTokenNeedsRefresh(expirationTime)) {
+    const client = await SpotifyClient.refreshToken(spotifyApi);
+    spotifyApi = client.spotifyApi;
+    expirationTime = client.expirationTime;
+  }
+};
+
+const isSpotifyPlaying = async () => {
+  await checkSpotifyApi();
+  const data = await spotifyApi.getMyCurrentPlayingTrack();
+  return data.body.is_playing;
+};
+
 const getSearchTerm = (message) => {
-  const splitMessage = message.split(' ');
+  const {text} = message;
+  const splitMessage = text.split(' ');
   let searchTerm = '';
   for (let i = 2; i < splitMessage.length; i += 1) {
     searchTerm += `${splitMessage[i]} `;
@@ -10,8 +40,8 @@ const getSearchTerm = (message) => {
 };
 
 
-const search = async (spotifyApi, term) => {
-  console.log(term);
+const search = async (term) => {
+  await checkSpotifyApi();
   const data = await spotifyApi.search(term, ['artist', 'track'], {limit: 1});
   if (data && data.body && data.body.artists && data.body.artists.items.length) {
     return data.body.artists.items[0].uri;
@@ -22,8 +52,9 @@ const search = async (spotifyApi, term) => {
   return undefined;
 };
 
-const playSong = async (message, spotifyApi) => {
-  const songUri = await search(spotifyApi, getSearchTerm(message));
+const playSong = async (message) => {
+  await checkSpotifyApi();
+  const songUri = await search(getSearchTerm(message));
   if (!songUri) {
     await sendMessage({response: 'No results found!', group_id: message.group_id});
     return;
@@ -32,5 +63,6 @@ const playSong = async (message, spotifyApi) => {
 };
 
 module.exports = {
-  playSong
+  playSong,
+  isSpotifyPlaying
 };
