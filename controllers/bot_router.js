@@ -1,6 +1,11 @@
 /* eslint no-restricted-syntax: 0 */
 /* eslint no-await-in-loop: 0 */
 
+const config = require('config');
+
+const permissions = config.get('SpotifyPermissions');
+
+const SpotifyWebApi = require('../external_services/spotify_client');
 
 const markovController = require('../bot_actions/markov');
 const sendGif = require('../bot_actions/gif');
@@ -18,10 +23,49 @@ const _ = require('lodash');
 const logger = require('winston');
 const portmanteau = require('../bot_actions/portmanteau');
 const nostra = require('nostra');
-const youtube = require('../bot_actions/youtube');
+const music = require('../bot_actions/music_helper');
+
+let spotifyApiClient;
+let spotifyExpirationTime;
+
+const changePermissions = async (message, flag) => {
+  const userId = message.user_id;
+  if (userId !== process.env.USER_ID) {
+    return;
+  }
+  const messageArray = message.text.split(' ');
+  let name = '';
+  for (let i = 3; i < messageArray.length; i += 1) {
+    name += messageArray[i].toLowerCase();
+  }
+  name = name.trim();
+  for (let j = 0; j < permissions.length; j += 1) {
+    if (permissions[j].name.includes(name)) {
+      permissions[j].canSpotify = flag;
+      break;
+    }
+  }
+  await sendMessage({response: `Set Spotify permissions for ${name} to ${flag}`, group_id: process.env.BOT_ID_TEST});
+};
+
+const changeGlobalPermissions = async (message, flag) => {
+  const userId = message.user_id;
+  if (userId !== process.env.USER_ID) {
+    console.log(userId);
+    console.log(process.env.USER_ID);
+    return;
+  }
+  permissions[0].IsEnabled = flag;
+  await sendMessage({response: `Set global Spotify permissions to ${flag}`, group_id: process.env.BOT_ID_TEST});
+};
+
 
 const phraseMap = new Map([
   [/^Ye\?|ye\?$/, async message => yeOrNerr(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? disable spotify for ([a-zA-Z ]+)/, async message => changePermissions(message, false)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? enable spotify for ([a-zA-Z ]+)/, async message => changePermissions(message, true)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? disable spotify/, async message => changeGlobalPermissions(message, false)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? enable spotify/, async message => changeGlobalPermissions(message, true)],
   [/@?[gG]((arrett)|(urt))[bB]ot,? talk to me/, async message => markovController.createMarkovString(message)],
   [/((50|[fF]ifty) [sS]hades [Oo]f [Gg]r[ea]y)/, async message => sendGif({text: 'hot garbage', group_id: message.group_id})],
   [/#[0-9a-zA-Z ]+/, async message => sendGif(message)],
@@ -40,12 +84,20 @@ const phraseMap = new Map([
   [/@?[gG]((arrett)|(urt))[bB]ot,? (([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))|(find me a ([a-zA-Z ]+) restaurant in ([0-9a-zA-Z .,]+))/,
     async message => findRestaurant(message)],
   [/@?[gG]((arrett)|(urt))[bB]ot,? fortune/, async message => sendMessage({response: nostra.generate(), group_id: message.group_id})],
-  [/@?[gG]((arrett)|(urt))[bB]ot,? play ([0-9a-zA-Z .,]+)/, async message => youtube.getYoutubeVideo(message)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? play ([0-9a-zA-Z .,]+)/, async message => music.fetchMusic(message, spotifyApiClient, permissions)],
   [/[a-zA-Z]+ [a-zA-Z]+/, async message => portmanteau.makepm(message)]
 ]);
 
 
 const respond = () => async (req, res) => {
+  if (!spotifyApiClient) {
+    const {spotifyApi} = SpotifyWebApi.authorize();
+    spotifyApiClient = spotifyApi;
+    spotifyExpirationTime = await SpotifyWebApi.refreshToken(spotifyApiClient);
+  }
+  if (SpotifyWebApi.checkIfTokenNeedsRefresh(spotifyExpirationTime)) {
+    spotifyExpirationTime = await SpotifyWebApi.refreshToken(spotifyApiClient);
+  }
   const message = req.body;
   const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/;
   if (!message.text || message.name.toLowerCase() === 'garrettbot' || (message.text && urlRegex.test(message.text))) {
