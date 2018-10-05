@@ -38,5 +38,10 @@
       "user_id": "50634962",
       "name": "sophie sophia mccabe"
     }
-  ]
+  ],
+  "SpotifyPlaylists": {
+    "ice cold": "spotify:user:garrett_lewis11:playlist:3yYlcIZedY60ozTNaWURvr",
+    "the works 2": "spotify:user:garrett_lewis11:playlist:3yYlcIZedY60ozTNaWURvr",
+    "party playlist": "spotify:user:garrett_lewis11:playlist:0hRQagKpnK0NOUBERTzvTB"
+  }
 }

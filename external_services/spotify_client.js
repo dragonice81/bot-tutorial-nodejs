@@ -21,7 +21,7 @@ const refreshToken = async (spotifyApi) => {
   return {spotifyApi, expirationTime};
 };
 
-const checkIfTokenNeedsRefresh = expirationTime => new Date().getTime() / 1000 < expirationTime;
+const checkIfTokenNeedsRefresh = expirationTime => new Date().getTime() / 1000 > expirationTime;
 
 module.exports = {
   authorize,

@@ -5,7 +5,7 @@ const fetchMusic = async (message, permissions) => {
   const permission = permissions.filter(p => p.user_id === message.user_id)[0];
   const isSpotify = await spotify.isSpotifyPlaying();
   if (isSpotify && permission.canSpotify && permissions[0].IsEnabled) {
-    await spotify.playSong(message);
+    await spotify.play(message);
   } else {
     await youtube.getYoutubeVideo(message);
   }
