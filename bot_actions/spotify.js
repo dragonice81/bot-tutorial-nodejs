@@ -8,6 +8,7 @@ let expirationTime;
 const songs = [];
 let timeSongEnd;
 let songOffset = 0;
+let nextJob;
 
 const initApi = async () => {
   spotifyApi = SpotifyClient.authorize();
@@ -58,23 +59,22 @@ const search = async (term) => {
   return undefined;
 };
 
-const schedulePlayback = async () => {
-  schedule.scheduleJob({start: timeSongEnd, end: timeSongEnd + 1000, rule: '*/1 * * * * *'}, async () => {
-    try {
-      await checkSpotifyApi();
-      await spotifyApi.play({uris: [songs[songOffset].uri]});
-      songOffset += 1;
-      timeSongEnd = undefined;
-      await isSpotifyPlaying();
-      if (songOffset < songs.length) {
-        await schedulePlayback();
-      }
-      return;
-    } catch (e) {
-      console.log(e);
-    }
-  });
-};
+const schedulePlayback = async () => schedule.scheduleJob({start: timeSongEnd, end: timeSongEnd + 1000, rule: '*/1 * * * * *'},
+ async () => {
+   try {
+     await checkSpotifyApi();
+     await spotifyApi.play({uris: [songs[songOffset].uri]});
+     songOffset += 1;
+     timeSongEnd = undefined;
+     await isSpotifyPlaying();
+     if (songOffset < songs.length) {
+       await schedulePlayback();
+     }
+     return;
+   } catch (e) {
+     await sendMessage({response: e, group_id: process.env.BOT_ID_TEST});
+   }
+ });
 
 const play = async (message) => {
   await checkSpotifyApi();
@@ -84,7 +84,10 @@ const play = async (message) => {
     return;
   }
   songs.push(song);
-  await schedulePlayback();
+  if (nextJob) {
+    nextJob.cancel();
+  }
+  nextJob = await schedulePlayback();
 };
 
 module.exports = {
