@@ -16,6 +16,8 @@ RUN rm -rf node_modules/
 
 RUN npm install --quiet --unsafe-perm
 
+RUN cd public/web-player && npm run build
+
 EXPOSE 5000
 
 CMD ["npm", "start"]

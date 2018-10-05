@@ -5,6 +5,7 @@ const getPort = require('get-port');
 const bodyParser = require('body-parser');
 const bot = require('./controllers/bot_router.js');
 const logger = require('winston');
+const path = require('path');
 
 const app = express();
 
@@ -14,6 +15,9 @@ const defaultPort = Number(process.env.PORT || 5000);
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json({limit: '512mb'}));
 
+
+// static resources
+app.use('/player', express.static(path.join(__dirname, 'public/web-player/dist/web-player')));
 
 // routes
 app.post('/', bot.respond());

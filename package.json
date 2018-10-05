@@ -4,8 +4,10 @@
   "description": "A Groupme chatbot",
   "main": "server.js",
   "scripts": {
+    "postinstall": "npm install -C public/web-player",
     "start": "node server.js",
     "start:dev": "node_modules/.bin/nodemon --inspect=0.0.0.0:9228 server.js",
+    "start:frontend": "cd public/web-player/ && npm install --quiet && npm start",
     "eslint": "eslint '**/*.js' --fix",
     "test": "mocha test/integration",
     "deploy": "heroku container:push web --app garrettbot-docker && heroku container:release web --app garrettbot-docker"
