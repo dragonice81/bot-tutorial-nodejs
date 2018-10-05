@@ -26,16 +26,16 @@ const music = require('../bot_actions/music_helper');
 const changePermissions = async (message, flag) => {
   const userId = message.user_id;
   const requestPermission = permissions.filter(p => p.user_id === userId);
-  if (!requestPermission.admin) {
+  if (!requestPermission[0].admin) {
     return;
   }
   const messageArray = message.text.split(' ');
   let name = '';
-  for (let i = 3; i < messageArray.length; i += 1) {
+  for (let i = 4; i < messageArray.length; i += 1) {
     name += `${messageArray[i].toLowerCase()} `;
   }
   name = name.trim();
-  for (let j = 0; j < permissions.length; j += 1) {
+  for (let j = 1; j < permissions.length; j += 1) {
     if (permissions[j].name.includes(name)) {
       permissions[j].canSpotify = flag;
       break;
@@ -47,7 +47,7 @@ const changePermissions = async (message, flag) => {
 const changeGlobalPermissions = async (message, flag) => {
   const userId = message.user_id;
   const requestPermission = permissions.filter(p => p.user_id === userId);
-  if (!requestPermission.admin) {
+  if (!requestPermission[0].admin) {
     return;
   }
   permissions[0].IsEnabled = flag;
