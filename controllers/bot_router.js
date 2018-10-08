@@ -22,6 +22,7 @@ const logger = require('winston');
 const portmanteau = require('../bot_actions/portmanteau');
 const nostra = require('nostra');
 const music = require('../bot_actions/music_helper');
+const urbanDictionary = require('../bot_actions/urban_dictionary');
 
 const changePermissions = async (message, flag) => {
   const userId = message.user_id;
@@ -80,6 +81,7 @@ const phraseMap = new Map([
     async message => findRestaurant(message)],
   [/@?[gG]((arrett)|(urt))[bB]ot,? fortune/, async message => sendMessage({response: nostra.generate(), group_id: message.group_id})],
   [/@?[gG]((arrett)|(urt))[bB]ot,? play ([0-9a-zA-Z .,]+)/, async message => music.fetchMusic(message, permissions)],
+  [/@?[gG]((arrett)|(urt))[bB]ot,? define ([0-9a-zA-Z ]+)/, async message => urbanDictionary.define(message)],
   [/[a-zA-Z]+ [a-zA-Z]+/, async message => portmanteau.makepm(message)]
 ]);
 
