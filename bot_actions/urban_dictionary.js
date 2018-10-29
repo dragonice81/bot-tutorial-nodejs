@@ -1,5 +1,5 @@
-const sendMessage = require('./send_message');
 const ud = require('urban-dictionary');
+const sendMessage = require('./send_message');
 
 const getSearchTerm = (message) => {
   const messageArray = message.split(' ');

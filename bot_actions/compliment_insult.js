@@ -1,5 +1,5 @@
-const users = require('../users.json');
 const _ = require('lodash');
+const users = require('../users.json');
 const compliments = require('../compliments.json');
 const insults = require('../insults.json');
 const sendMessage = require('./send_message');

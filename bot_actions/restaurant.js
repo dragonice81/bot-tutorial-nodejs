@@ -40,7 +40,9 @@ const findRestaurant = async (message) => {
   await sendMessage({
     response: restaurantAddress,
     group_id: message.group_id,
-    attachments: [{type: 'location', name: restaurantName, lat: restaurantLocation.lat, lng: restaurantLocation.lng}]
+    attachments: [{
+      type: 'location', name: restaurantName, lat: restaurantLocation.lat, lng: restaurantLocation.lng
+    }]
   });
 };
 

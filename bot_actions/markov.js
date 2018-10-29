@@ -1,6 +1,6 @@
 const Markov = require('markov-strings');
-const messages = require('../messages');
 const _ = require('lodash');
+const messages = require('../messages');
 const sendMessage = require('./send_message');
 
 const createMarkovString = async (message) => {

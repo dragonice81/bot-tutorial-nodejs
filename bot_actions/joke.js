@@ -1,7 +1,7 @@
-let jokes = require('../jokes.json');
 const _ = require('lodash');
-const sendMessage = require('./send_message');
 const logger = require('winston');
+let jokes = require('../jokes.json');
+const sendMessage = require('./send_message');
 
 let saidJokes = [];
 

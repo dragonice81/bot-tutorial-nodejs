@@ -3,9 +3,9 @@ require('express-async-errors');
 require('dotenv').config();
 const getPort = require('get-port');
 const bodyParser = require('body-parser');
-const bot = require('./controllers/bot_router.js');
 const logger = require('winston');
 const path = require('path');
+const bot = require('./controllers/bot_router.js');
 
 const app = express();
 

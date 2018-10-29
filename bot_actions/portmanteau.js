@@ -49,7 +49,7 @@ const letterTrios = (inString) => {
 
 
 const makepmByTrios = (stringA, stringB) => {
-	// find all shared trios and their positions in each string
+  // find all shared trios and their positions in each string
   let aTrios = letterTrios(stringA);
   let bTrios = letterTrios(stringB);
   if (aTrios.length < 3 || bTrios.length < 3) {
@@ -58,7 +58,7 @@ const makepmByTrios = (stringA, stringB) => {
   aTrios = aTrios.slice(1);
   bTrios = bTrios.slice(0, bTrios.length - 2);
 
-	// look for shared trios
+  // look for shared trios
   let hasSharedTrios = false;
   const posOfTrios = [];
   for (let i = 0; i < aTrios.length; i += 1) {
@@ -84,7 +84,7 @@ const makepmByTrios = (stringA, stringB) => {
     return 'FAIL: no shared trios';
   }
 
-	// put together and return portmanteau
+  // put together and return portmanteau
   const outA = stringA.slice(posOfTrios[0]); // everything up to and EXcluding the chosen trio in string A
   const outB = stringB.slice(posOfTrios[1], stringB.length); // everything after and INcluding the chosen trio in string B
   return `${outA}${outB}`;
@@ -108,7 +108,7 @@ const makepm = async (message) => {
     await sendMessage({response: `${stringA} + ${stringB} = crapids`, group_id: message.group_id});
     return 'crapids';
   }
-	// try to make pm by pairs first
+  // try to make pm by pairs first
   const triopm = makepmByTrios(stringA, stringB);
 
   if (!triopm.includes('FAIL')) {
@@ -116,11 +116,11 @@ const makepm = async (message) => {
     return triopm;
   }
 
-	// check if both strings have at least 1 vowel
+  // check if both strings have at least 1 vowel
   if (!hasVowel(stringA) || !hasVowel(stringB)) {
     return "FAIL: don't have vowels in both strings";
   }
-	// find all vowels and their positions in each string
+  // find all vowels and their positions in each string
   const vowels = ['a', 'e', 'i', 'o', 'u'];
   const aVowels = [];
   const bVowels = [];
@@ -141,7 +141,7 @@ const makepm = async (message) => {
     }
   });
 
-	// see if A and B have any vowels in common
+  // see if A and B have any vowels in common
   let haveCommonVowels = false;
   const vowelPairPositions = [];
   for (let i = 0; i < aVowels.length; i += 1) {
@@ -157,9 +157,9 @@ const makepm = async (message) => {
     }
   }
   let shouldUseCommonVowels = false;
-	// place to record positions of vowels we decide to use
+  // place to record positions of vowels we decide to use
   let posOfVowelsToUse = [-1, -1];
-	// if we have common vowels, choose whether to use them based on position
+  // if we have common vowels, choose whether to use them based on position
   if (haveCommonVowels) {
     const margin = 2; // guarantees output satisfies len(pm) > 2*margin
     vowelPairPositions.forEach((vowelPairPosition) => {

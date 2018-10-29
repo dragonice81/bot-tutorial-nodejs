@@ -4,9 +4,9 @@ const logger = require('winston');
 const getBotId = (groupId) => {
   if (+groupId === 21255858) {
     return process.env.BROM_BOT_ID;
-  } else if (+groupId === 39437389) {
+  } if (+groupId === 39437389) {
     return process.env.AMERICA_BOT_ID;
-  } else if (+groupId === 40632517) {
+  } if (+groupId === 40632517) {
     return process.env.WORK_BOT_ID;
   }
   return undefined;

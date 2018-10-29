@@ -1,7 +1,7 @@
-let videos = require('../videos.json');
 const _ = require('lodash');
-const sendMessage = require('./send_message');
 const logger = require('winston');
+let videos = require('../videos.json');
+const sendMessage = require('./send_message');
 
 
 let saidVideos = [];

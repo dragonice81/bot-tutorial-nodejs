@@ -1,8 +1,8 @@
 const request = require('request-promise-native');
-const sendToGroupmeImageService = require('./groupme_image_service');
 const _ = require('lodash');
-const sendMessage = require('./send_message');
 const logger = require('winston');
+const sendToGroupmeImageService = require('./groupme_image_service');
+const sendMessage = require('./send_message');
 
 const startingDarbyPicIds = [1, 2, 3, 4, 5, 6];
 let notSentDarbyPicIds = [1, 2, 3, 4, 5, 6];
@@ -26,8 +26,8 @@ const sendGif = async (message) => {
   }
   try {
     const parsedData = JSON.parse(await request.get(
-                `https://api.giphy.com/v1/gifs/search?q=${message.text.split('#')[1].trim()}&api_key=dc6zaTOxFJmzC&rating=r&limit=25`
-        ));
+      `https://api.giphy.com/v1/gifs/search?q=${message.text.split('#')[1].trim()}&api_key=dc6zaTOxFJmzC&rating=r&limit=25`
+    ));
     if (parsedData && parsedData.data) {
       if (parsedData.data.length) {
         const giphyResponse = _.sample(parsedData.data);

@@ -33,8 +33,7 @@ const getDirections = async (message) => {
   const googleMapsUri = `https://www.google.com/maps/dir/${beginningLocString}/${destLocString}`;
   const shortenerResponse = await request.post(urlShortenerUrl, {json: {longUrl: googleMapsUri}});
   const shortUrl = shortenerResponse.id;
-  const botResponse =
-      `Directions to ${destLocString.replace(/[+]/g, ' ')} from ${beginningLocString.replace(/[+]/g, ' ')}
+  const botResponse = `Directions to ${destLocString.replace(/[+]/g, ' ')} from ${beginningLocString.replace(/[+]/g, ' ')}
 
 It will take ${response.routes[0].legs[0].duration.text} to travel ${response.routes[0].legs[0].distance.text}
 

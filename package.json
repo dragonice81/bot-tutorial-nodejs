@@ -16,14 +16,14 @@
     "eslint"
   ],
   "dependencies": {
-    "body-parser": "1.18.2",
+    "body-parser": "1.18.3",
     "cool-ascii-faces": "1.3.x",
     "director": "1.2.8",
     "eightball": "1.0.1",
-    "express": "4.16.3",
-    "get-port": "3.2.0",
-    "lodash": "4.17.10",
-    "markov-strings": "1.4.0",
+    "express": "4.16.4",
+    "get-port": "4.0.0",
+    "lodash": "4.17.11",
+    "markov-strings": "1.5.2",
     "node-schedule": "1.3.0",
     "request-promise-native": "1.0.5",
     "shorturl": "0.0.3",
@@ -31,9 +31,9 @@
     "text-meme": "2.3.0",
     "fs-readfile-promise": "3.0.1",
     "color-to-name": "1.0.15",
-    "express-async-errors": "2.1.2",
-    "dotenv": "5.0.1",
-    "winston": "2.4.2",
+    "express-async-errors": "3.1.1",
+    "dotenv": "6.1.0",
+    "winston": "3.1.0",
     "nostra": "0.0.7",
     "parse-reminder": "1.2.0",
     "spotify-web-api-node": "4.0.0",
@@ -41,10 +41,10 @@
     "urban-dictionary": "2.2.1"
   },
   "devDependencies": {
-    "eslint": "3.17.1",
-    "eslint-config-airbnb-base": "11.1.1",
-    "eslint-plugin-import": "2.2.0",
-    "nodemon": "1.12.1",
+    "eslint": "5.8.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-plugin-import": "2.14.0",
+    "nodemon": "1.18.5",
     "pre-commit": "1.2.2"
   },
   "engines": {

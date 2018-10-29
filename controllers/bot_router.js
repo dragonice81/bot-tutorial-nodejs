@@ -5,6 +5,9 @@ const config = require('config');
 
 const permissions = config.get('SpotifyPermissions');
 
+const _ = require('lodash');
+const logger = require('winston');
+const nostra = require('nostra');
 const markovController = require('../bot_actions/markov');
 const sendGif = require('../bot_actions/gif');
 const directions = require('../bot_actions/directions');
@@ -17,10 +20,7 @@ const getWeather = require('../bot_actions/weather');
 const makeTextMeme = require('../bot_actions/text_meme');
 const findRestaurant = require('../bot_actions/restaurant');
 const yeOrNerr = require('../bot_actions/yeOrNerr');
-const _ = require('lodash');
-const logger = require('winston');
 const portmanteau = require('../bot_actions/portmanteau');
-const nostra = require('nostra');
 const music = require('../bot_actions/music_helper');
 const urbanDictionary = require('../bot_actions/urban_dictionary');
 
