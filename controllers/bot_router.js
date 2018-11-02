@@ -6,7 +6,6 @@ const config = require('config');
 const permissions = config.get('SpotifyPermissions');
 
 const _ = require('lodash');
-const logger = require('winston');
 const nostra = require('nostra');
 const markovController = require('../bot_actions/markov');
 const sendGif = require('../bot_actions/gif');
@@ -21,6 +20,7 @@ const makeTextMeme = require('../bot_actions/text_meme');
 const findRestaurant = require('../bot_actions/restaurant');
 const yeOrNerr = require('../bot_actions/yeOrNerr');
 const portmanteau = require('../bot_actions/portmanteau');
+const logger = require('../logger');
 const music = require('../bot_actions/music_helper');
 const urbanDictionary = require('../bot_actions/urban_dictionary');
 

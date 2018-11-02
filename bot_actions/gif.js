@@ -1,6 +1,6 @@
 const request = require('request-promise-native');
 const _ = require('lodash');
-const logger = require('winston');
+const logger = require('../logger');
 const sendToGroupmeImageService = require('./groupme_image_service');
 const sendMessage = require('./send_message');
 

@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const logger = require('winston');
+const logger = require('../logger');
 let videos = require('../videos.json');
 const sendMessage = require('./send_message');
 

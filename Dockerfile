@@ -1,22 +1,24 @@
-FROM node:10-slim
+FROM node:11-alpine
 
 WORKDIR /garrettbot
 
-COPY . /garrettbot
+COPY package*.json ./
 
-RUN apt-get update && apt-get install -y \
-    libcairo2-dev \
-    libjpeg-dev \
-    libpango1.0-dev \
-    libgif-dev \
-    build-essential \
-    g++
+RUN apk add --no-cache --virtual build-deps \
+    gcc \
+    make \
+    g++ \
+    python \
+    bash \
+    cairo-dev \
+    libjpeg-turbo-dev \
+    pango-dev \
+    giflib-dev \
+    && npm install --unsafe-perm \
+    && apk del build-deps \
+    && rm -rf /var/cache/apk 
 
-RUN rm -rf node_modules/
-
-RUN npm install --quiet --unsafe-perm
-
-RUN cd public/web-player && npm run build
+COPY . .
 
 EXPOSE 5000
 

@@ -1,5 +1,5 @@
 const request = require('request-promise-native');
-const logger = require('winston');
+const logger = require('../logger');
 
 const getBotId = (groupId) => {
   if (+groupId === 21255858) {
