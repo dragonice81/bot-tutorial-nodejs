@@ -1,7 +1,9 @@
 version: '3.4'
 services:
   garrettbot:
-    build: .
+    build:
+      context: .
+      target: dev
     volumes:
           - ".:/garrettbot"
           - "/garrettbot/node_modules"
