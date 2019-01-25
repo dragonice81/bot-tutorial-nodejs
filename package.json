@@ -2,20 +2,33 @@
   "name": "GarrettBot",
   "version": "2.0.1",
   "description": "A Groupme chatbot",
+  "keywords": [
+    "express",
+    "heroku",
+    "node"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dragonice81/garrett-bot"
+  },
+  "license": "MIT",
   "main": "server.js",
   "scripts": {
+    "deploy": "heroku container:push web --app garrettbot-docker && heroku container:release web --app garrettbot-docker",
+    "eslint": "eslint '**/*.js' --fix",
     "start": "node server.js",
     "start:dev": "node_modules/.bin/nodemon --inspect=0.0.0.0:9228 server.js",
     "start:frontend": "cd public/web-player/ && npm install --quiet && npm start",
-    "eslint": "eslint '**/*.js' --fix",
-    "test": "mocha test/integration",
-    "deploy": "heroku container:push web --app garrettbot-docker && heroku container:release web --app garrettbot-docker"
+    "test": "mocha test/integration"
   },
   "pre-commit": [
     "eslint"
   ],
   "dependencies": {
     "body-parser": "1.18.3",
+    "color-to-name": "1.0.15",
+    "config": "3.0.1",
+    "dotenv": "6.2.0",
     "eightball": "1.0.1",
     "express": "4.16.4",
     "get-port": "4.1.0",
@@ -31,28 +44,19 @@
     "dotenv": "6.2.0",
     "winston": "3.1.0",
     "nostra": "0.0.7",
+    "request-promise-native": "1.0.5",
     "spotify-web-api-node": "4.0.0",
     "config": "3.0.1",
     "urban-dictionary": "2.2.1"
   },
   "devDependencies": {
-    "eslint": "5.9.0",
+    "eslint": "5.10.0",
     "eslint-config-airbnb-base": "13.1.0",
     "eslint-plugin-import": "2.14.0",
-    "nodemon": "1.18.6",
+    "nodemon": "1.18.9",
     "pre-commit": "1.2.2"
   },
   "engines": {
     "node": "11.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/dragonice81/garrett-bot"
-  },
-  "keywords": [
-    "node",
-    "heroku",
-    "express"
-  ],
-  "license": "MIT"
+  }
 }
