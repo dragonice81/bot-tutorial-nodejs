@@ -4,10 +4,12 @@ const logger = require('../logger');
 const getBotId = (groupId) => {
   if (+groupId === 21255858) {
     return process.env.BROM_BOT_ID;
-  } if (+groupId === 39437389) {
+  } else if (+groupId === 39437389) {
     return process.env.AMERICA_BOT_ID;
-  } if (+groupId === 40632517) {
+  } else if (+groupId === 40632517) {
     return process.env.WORK_BOT_ID;
+  } else if (+groupId === 47352552) {
+    return process.env.RK_ID;
   }
   return undefined;
 };
