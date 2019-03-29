@@ -50,11 +50,13 @@
     "urban-dictionary": "2.2.1"
   },
   "devDependencies": {
+    "@types/dotenv": "4.0.3",
     "eslint": "5.10.0",
     "eslint-config-airbnb-base": "13.1.0",
     "eslint-plugin-import": "2.14.0",
     "nodemon": "1.18.9",
-    "pre-commit": "1.2.2"
+    "pre-commit": "1.2.2",
+    "typescript":"3.4.1"
   },
   "engines": {
     "node": "11.0.0"
