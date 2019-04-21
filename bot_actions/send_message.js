@@ -1,8 +1,24 @@
 const request = require('request-promise-native');
 const logger = require('../logger');
 
+const getBotId = (groupId) => {
+  if (+groupId === 21255858) {
+    return process.env.BROM_BOT_ID;
+  } else if (+groupId === 39437389) {
+    return process.env.AMERICA_BOT_ID;
+  } else if (+groupId === 40632517) {
+    return process.env.WORK_BOT_ID;
+  } else if (+groupId === 47352552) {
+    return process.env.RK_ID;
+  } else if (+groupId === 48280233) {
+    return process.env.MARDI_GRAS_BOT_ID;
+  }
+  return undefined;
+};
+
 const sendMessage = async (botResponse, error) => {
-  const botID = error ? process.env.BOT_ID_TEST : botResponse.group_id;
+  const messageBotId = getBotId(botResponse.group_id);
+  const botID = error || !messageBotId ? process.env.BOT_ID_TEST : messageBotId;
   logger.info(`sending ${botResponse.response} to ${botID}`);
   const attachments = botResponse.attachments || [];
   const body = {
