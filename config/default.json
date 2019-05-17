@@ -1,44 +1,44 @@
 {
-  "SpotifyPermissions": [
-    {
-      "IsEnabled": true
-    },
-    {
-      "canSpotify": true,
-      "user_id": "16995091",
-      "name": "darby mackintosh"
-    },
-    {
-      "canSpotify": true,
-      "user_id": "12825337",
-      "name": "alexa goodman"
-    },
-     {
-      "canSpotify": true,
-      "admin": true,
-      "user_id": "12828580",
-      "name": "garrett lewis"
-    },
-     {
-      "name": "kali vanderpool",
-      "user_id": "12825342",
-      "canSpotify": true
-    },
-    {
-      "canSpotify": true,
-      "user_id": "29860883",
-      "name": "joe joseph michael"
-    },
-    {
-      "user_id": "6229931",
-      "name": "taylor fienhage"
-    },
-    {
-      "canSpotify": true,
-      "user_id": "50634962",
-      "name": "sophie sophia mccabe"
-    }
-  ],
+  "SpotifyPermissions": {
+    "global": true,
+    "users": [
+      {
+        "canSpotify": true,
+        "user_id": "16995091",
+        "name": "darby mackintosh"
+      },
+      {
+        "canSpotify": true,
+        "user_id": "12825337",
+        "name": "alexa goodman"
+      },
+       {
+        "canSpotify": true,
+        "admin": true,
+        "user_id": "12828580",
+        "name": "garrett lewis"
+      },
+       {
+        "name": "kali vanderpool",
+        "user_id": "12825342",
+        "canSpotify": true
+      },
+      {
+        "canSpotify": true,
+        "user_id": "29860883",
+        "name": "joe joseph michael"
+      },
+      {
+        "user_id": "6229931",
+        "name": "taylor fienhage"
+      },
+      {
+        "canSpotify": true,
+        "user_id": "50634962",
+        "name": "sophie sophia mccabe"
+      }
+    ]
+  },
   "SpotifyPlaylists": {
     "ice cold": "spotify:user:garrett_lewis11:playlist:3yYlcIZedY60ozTNaWURvr",
     "the works 2": "spotify:user:garrett_lewis11:playlist:3yYlcIZedY60ozTNaWURvr",
